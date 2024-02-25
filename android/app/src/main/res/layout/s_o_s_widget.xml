@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_container"
+    style="@style/Widget.Android.AppWidget.Container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:theme="@style/Theme.Android.AppWidgetContainer">
+
+    <ImageView
+        android:id="@+id/sos_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:adjustViewBounds="true"
+        android:background="@drawable/record"
+        android:scaleType="fitCenter"
+        android:src="@drawable/sos"
+        android:visibility="visible"
+        tools:visibility="visible"
+        android:contentDescription="@string/contentDescription" />
+
+</RelativeLayout>
