@@ -39,7 +39,7 @@ class SOSWidget : HomeWidgetProvider() {
                 val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
-                    Uri.parse("sosWidget://titleClicked"))
+                    Uri.parse("sosWidget://message?message=clicked"))
                 setOnClickPendingIntent(R.id.widget_container, pendingIntentWithData)
             }
             appWidgetManager.updateAppWidget(widgetId, views)

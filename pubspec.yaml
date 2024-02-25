@@ -57,6 +57,7 @@ dependencies:
   flutter_svg: ^2.0.9
   circular_countdown_timer: ^0.2.3
   popover: ^0.3.0
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:

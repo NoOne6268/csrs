@@ -12,7 +12,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:csrs/pages/countdown_timer.dart';
 import 'package:go_router/go_router.dart';
 
-const platform = MethodChannel('datsol.flutter.dev/widget');
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // The route configuration.
 final GoRouter _router = GoRouter(
@@ -58,25 +58,13 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-// Home Widget Plugin
-void _checkForWidgetLaunch() {
-  HomeWidget.initiallyLaunchedFromHomeWidget()
-      .then((value) => _launchedFromWidget(value));
-}
-
-void _launchedFromWidget(Uri? uri) {
-  if (uri != null) {
-    navigatorKey.currentState?.pushNamed('/sos');
+@pragma("vm:entry-point")
+Future<void> interactiveCallback(Uri? data) async {
+  if (data == Uri.parse('sosWidget://message?message=clicked')) {
+    await HomeWidget.setAppGroupId('YOUR_GROUP_ID');
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
   }
 }
-
-@override
-void didChangeDependencies(BuildContext context) {
-  _checkForWidgetLaunch();
-  HomeWidget.widgetClicked.listen(_launchedFromWidget);
-}
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -122,11 +110,32 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+
+  //Home widget Plugin start
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget()
+        .then(_launchedFromWidget);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _checkForWidgetLaunch();
     HomeWidget.widgetClicked.listen(_launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri == Uri.parse('sosWidget://message?message=clicked')) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+    }
+  }
+  //end
+
+  @override
+  void initState() {
+    HomeWidget.setAppGroupId('YOUR_GROUP_ID');
+    HomeWidget.registerInteractivityCallback(interactiveCallback);
+    super.initState();
   }
 
   @override
