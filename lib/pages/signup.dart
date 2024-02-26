@@ -88,16 +88,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       context,
                       textColor: Colors.black,
                       bgColor: Colors.white,
-                      text: 'Send OTP',
-                      onPress: () {
+                      text: 'Sign Up',
+                      onPress: () async {
                         if(_formKey.currentState!.validate()){
-                          setState(() {
-                            isOtp = true;
-                          });
+                          final userId = await nodeApis.getUserID();
+                          if (!context.mounted) return;
+                          await nodeApis.signUp(
+                          userController.text,
+                          passwordController.text,
+                          emailController.text,
+                          userId,
+                          context);
+                          }
+                        context.push('home');
+
 
                         }
                         // context.push('/home');
-                      },
                     ),
                     const HorizontalOrLine(
                       label: "OR",
@@ -334,13 +341,13 @@ class _SignupScreenState extends State<SignupScreen> {
 // //       context);
 // final userId = await nodeApis.getUserID();
 // if (!context.mounted) return;
-// await nodeApis.signUp(
-// userController.text,
-// passwordController.text,
-// emailController.text,
-// userId,
-// context);
-// }
+  // await nodeApis.signUp(
+  // userController.text,
+  // passwordController.text,
+  // emailController.text,
+  // userId,
+  // context);
+  // }
 // else{
 // setState(() {
 // isOtpMatched = false;
