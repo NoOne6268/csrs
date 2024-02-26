@@ -1,3 +1,4 @@
+import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/pages/welcome.dart';
 import 'package:home_widget/home_widget.dart';
@@ -53,6 +54,15 @@ final GoRouter _router = GoRouter(
             return const LoginScreen();
           },
         ),
+        GoRoute(path: 'verifyotp',
+            name: 'verifyotp',
+            builder: (BuildContext context, GoRouterState state){
+              return  OtpVerificationScreen(
+                loginOrRegister : state.uri.queryParameters['loginOrRegister'],
+                nextRoute : state.uri.queryParameters['nextRoute'],
+
+              );
+            }),
       ],
     ),
   ],

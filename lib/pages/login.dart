@@ -13,11 +13,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool obscureText = true;
+  bool isPhone = false;
   AuthService authService = AuthService();
   NodeApis nodeApis = NodeApis();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -61,54 +62,104 @@ class _LoginScreenState extends State<LoginScreen> {
                     topRight: Radius.circular(24)),
                 color: Colors.white,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    child: kAuthTextField('Institute Email', emailController),
-                  ),
-                  const SizedBox(
-                    height: 25.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30.0,
-                      vertical: 4.0,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(
+                      height: 20,
                     ),
-                    child: kAuthOtpButton(
-                      context,
-                      textColor: Colors.black,
-                      bgColor: const Color(0xFF90BDDB),
-                      onPress: () {},
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: kAuthFormField(emailController , isPhone ? 'Phone No' : 'Institute Email', 'email can\'t be empty' , key: const ValueKey('email')),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 70.0,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      context.go('/login');
-                    },
-                    child: const Center(
-                      child: Text(
-                        'Login Through Phone Number',
-                        style: TextStyle(
-                          fontSize: 25,
-                          shadows: [
-                            Shadow(color: Colors.black, offset: Offset(0, -5))
-                          ],
-                          color: Colors.transparent,
-                          decoration: TextDecoration.underline,
+                    const SizedBox(
+                      height: 25.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                        vertical: 4.0,
+                      ),
+                      child: kAuthOtpButton(
+                        context,
+                        textColor: Colors.black,
+                        bgColor: const Color(0xFF90BDDB),
+                        text: 'Send OTP',
+                        onPress: () {
+                          if(_formKey.currentState!.validate()){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Processing Data'),
+                              ),
+                            );
+                            // nodeApis.logIn(
+                            //   emailController.text,
+                            //   passwordController.text,
+                            //   context,
+                            // );
+                            context.goNamed('verifyotp', queryParameters: {'loginOrRegister' : 'login', 'nextRoute' : '/login'});
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isPhone = !isPhone;
+                        });
+                      },
+                      child:  Center(
+                        child: Text(
+                          isPhone ? 'Login Through Insti Email' :
+                          'Login Through Phone Number',
+                          style: const TextStyle(
+                            fontSize: 25,
+                            shadows: [
+                              Shadow(color: Colors.black, offset: Offset(0, -5))
+                            ],
+                            color: Colors.transparent,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 20.0,
+
+                    ),
+                    const HorizontalOrLine(
+                      label: "OR",
+                      height: 10.0,
+                      color: Colors.black,
+                    ),
+
+
+                    GestureDetector(
+                      onTap: () {
+                        context.go('/signup');
+                      },
+                      child: const Center(
+                        child: Text(
+                          'Signup Instead',
+                          style: TextStyle(
+                            fontSize: 25,
+                            shadows: [
+                              Shadow(color: Colors.black, offset: Offset(0, -5))
+                            ],
+                            color: Colors.transparent,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           )

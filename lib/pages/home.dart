@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFFBBE1FA),
         child: ListView(
           padding: EdgeInsets.zero,
-          children: const [
+          children:  [
             DrawerHeader(
               margin: EdgeInsets.zero,
               decoration: BoxDecoration(
@@ -255,6 +255,41 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               title: Text('Profile'),
+              leading: Icon(
+                Icons.person,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('Settings'),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('Help'),
+              leading: Icon(
+                Icons.help,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('About'),
+              leading: Icon(
+                Icons.info,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                context.go('/login');
+              },
+              title: Text('Logout'),
+              leading: Icon(
+                Icons.logout,
+                color: Colors.black,
+              ),
             )
           ],
         ),

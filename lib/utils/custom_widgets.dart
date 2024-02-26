@@ -17,7 +17,7 @@ class HorizontalOrLine extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(
-          height: 100.0,
+          height: 20.0,
         ),
         Row(
           children: <Widget>[
@@ -105,6 +105,7 @@ TextField kAuthTextField(String hintText, TextEditingController controller) {
 Padding kAuthOtpButton(BuildContext context,
     {required Color textColor,
     required Color bgColor,
+      required String text,
     required void Function()? onPress}) {
   return Padding(
     padding: const EdgeInsets.symmetric(
@@ -119,7 +120,7 @@ Padding kAuthOtpButton(BuildContext context,
         padding: const EdgeInsets.symmetric(vertical: 7.0),
       ),
       child: Text(
-        'Send OTP',
+        text,
         style: TextStyle(
           color: textColor,
           fontSize: 25.0,

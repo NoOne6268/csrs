@@ -88,8 +88,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       context,
                       textColor: Colors.black,
                       bgColor: Colors.white,
+                      text: 'Send OTP',
                       onPress: () {
-                        context.push('/home');
+                        if(_formKey.currentState!.validate()){
+                          setState(() {
+                            isOtp = true;
+                          });
+
+                        }
+                        // context.push('/home');
                       },
                     ),
                     const HorizontalOrLine(
