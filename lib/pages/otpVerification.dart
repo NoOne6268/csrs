@@ -1,8 +1,26 @@
+import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:go_router/go_router.dart';
+
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({super.key, String?  loginOrRegister, String? nextRoute});
+  const OtpVerificationScreen(
+      {super.key,
+      this.loginOrRegister,
+      this.nextRoute,
+      this.isEmail,
+      this.to,
+      this.rollNo,
+      this.phone,
+      this.isSignup});
+
+  final String? loginOrRegister;
+  final String? nextRoute;
+  final String? isEmail;
+  final String? to;
+  final String? rollNo;
+  final String? phone;
+  final String? isSignup;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -10,9 +28,10 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
+  NodeApis nodeApis = NodeApis();
   TextEditingController otpController = TextEditingController();
-  @override
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -63,25 +82,91 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    kAuthOtpButton(context ,
+                    kAuthOtpButton(context,
                         textColor: Colors.white,
                         bgColor: Colors.black,
-                        text: 'verify',
-                        onPress: (){
-                          if (_formKey.currentState!.validate()) {
-                           context.go('/home');
+                        text: widget.loginOrRegister!, onPress: () {
+                      if (_formKey.currentState!.validate()) {
+                        print('to is ${widget.to!}');
+                        print('isEmail is ${widget.isEmail!}');
+                        if (widget.isSignup == 'true') {
+                          nodeApis
+                              .verifyOtp(
+                                  'signup/verify',
+                                  widget.to!,
+                                  otpController.text,
+                                  widget.isEmail! == 'true' ? true : false)
+                              .then((value) {
+                            if (value['success'] == false) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('OTP verification failed')));
+                            }else {
+                              if(widget.isEmail == 'true') {
+                                context.pushNamed(widget.nextRoute!,
+                                    queryParameters: {
+                                      'isEmailVerified': 'true',
+                                      'email': widget.to!,
+                                      'rollNo': widget.rollNo!
+                                    });
+                              }else {
+                                context.pushNamed(widget.nextRoute!,
+                                    queryParameters: {
+                                      'phone' : '${widget.to}'
+                                    });
+                              }
+
+                            }
+                          });
+                        } else {
+                          nodeApis
+                              .verifyOtp(
+                                  'login/verify',
+                                  widget.to!,
+                                  otpController.text,
+                                  widget.isEmail! == 'true' ? true : false)
+                              .then((value) {
+                            if (value['success'] == false) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('OTP verification failed')));
+                            } else {
+                              context.pushNamed(widget.nextRoute!,
+                                  queryParameters: {
+                                    'isEmailVerified': 'true',
+                                    'email': widget.to,
+                                    'rollNo': widget.rollNo
+                                  });
+                            }
+                          });
+                        }
+                        nodeApis
+                            .verifyOtp(
+                                'signup/verify',
+                                '${widget.to!}@kgpian.iitkgp.ac.in',
+                                otpController.text,
+                                widget.isEmail! == 'true' ? true : false)
+                            .then((value) {
+                          if (value['success'] == false) {
+                            print('otp verification failed');
                           }
-
-                        })
-                ],
-
-                    ),
-
-                        ),
-                      ),
-                    ),
+                          context
+                              .pushNamed(widget.nextRoute!, queryParameters: {
+                            'isEmailVerified': 'true',
+                            'email': '${widget.to}@kgpian.iitkgp.ac.in',
+                            'rollNo': '${widget.rollNo}'
+                          });
+                        });
+                        // context.go('/home');
+                      }
+                    })
                   ],
                 ),
-              );
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

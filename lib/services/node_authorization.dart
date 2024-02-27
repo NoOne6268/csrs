@@ -131,7 +131,55 @@ var currentEmail = '';
       return {};
     }
   }
-
+  Future<Map> sendOtp(String route , String to, bool isEmail)async{
+    try{
+      String through = 'phone';
+      if(isEmail){
+         through = 'email';
+      }
+      print('through is $through and sending to $to ');
+      final response = await http.post(
+        Uri.parse('$baseUrl/$route'),
+        body: jsonEncode(<String, String>{
+          through : to,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      print('this is response after sending the otp ${response.body}');
+      return jsonDecode(response.body);
+    }
+    catch(e){
+      print(e);
+      return {};
+    }
+}
+Future<Map> verifyOtp(String route , String to, String otp, bool isEmail)async {
+  try {
+    String through = 'phone';
+    if (isEmail) {
+      through = 'email';
+    }
+    print('through is $through');
+    final response = await http.post(
+      Uri.parse('$baseUrl/$route'),
+      body: jsonEncode(<String, String>{
+        through: to,
+        'otp': otp,
+      }),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    print('this is response after verifying the otp ${response.body}');
+    return jsonDecode(response.body);
+  }
+  catch (e) {
+    print(e);
+    return {};
+  }
+}
   Future<Map<String , dynamic>> saveContact(String email, String contact) async {
     try {
       final response = await http.put(
@@ -173,6 +221,7 @@ var currentEmail = '';
     }
 
   }
+
 
 
 

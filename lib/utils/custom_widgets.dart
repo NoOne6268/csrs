@@ -143,6 +143,16 @@ Padding kAuthFormField(
         }
         return null;
       },
+      style: const TextStyle(
+        fontSize: 25,
+        shadows: [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 2.0,
+          ),
+        ],
+
+      ),
       controller: controller,
       decoration: InputDecoration(
           filled: true,
@@ -151,6 +161,13 @@ Padding kAuthFormField(
           hintStyle: const TextStyle(
             fontSize: 25,
           ),
+          suffixText:
+            hintText == 'Insti mail' ? '@kgpian.iitkgp.ac.in' : '',
+          suffixStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 23,
+          ),
+
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Colors.white),

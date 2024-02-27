@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/firebase_authorization.dart';
@@ -5,25 +7,25 @@ import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen(
+      {super.key, String? isEmailVerified, String? email, String? rollNo});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  AuthService authService = AuthService();
+  // AuthService authService = AuthService();
+  final isEmail = isEmailVerified ;
+
   NodeApis nodeApis = NodeApis();
-  bool isOtp = false;
   bool obscureText = true;
-  bool isEmail = false;
-  bool isOtpMatched = true;
-  String oTP = 'blhabl';
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController userController = TextEditingController();
-  TextEditingController otpController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController rollNoController = TextEditingController();
+
+  static get isEmailVerified => 'false';
 
   @override
   Widget build(BuildContext context) {
@@ -67,45 +69,59 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    kAuthFormField(
-                      userController,
-                      'Full Name',
-                      'Name cannot be empty',
-                      key: const ValueKey('username'),
-                    ),
-                    kAuthPassFormField(
-                      'Password',
-                      passwordController,
-                    ),
-                    kAuthFormField(emailController, 'Institute Email',
-                        'Email cannot be empty.',
-                        key: const ValueKey('email')),
+                    isEmailVerified == 'true'
+                        ? kAuthFormField(phoneController, 'Phone No',
+                            'phone can not be empty',
+                            key: const ValueKey('phone'))
+                        : kAuthFormField(
+                            rollNoController,
+                            'Roll No',
+                            'Name cannot be empty',
+                            key: const ValueKey('username'),
+                          ),
+                    // kAuthPassFormField(
+                    //   'Password',
+                    //   passwordController,
+                    // ),
+                    isEmailVerified == 'false'
+                        ? kAuthFormField(emailController, 'Insti mail',
+                            'Email cannot be empty.',
+                            key: const ValueKey('email'))
+                        : const Padding(padding: EdgeInsets.zero),
 
                     const SizedBox(
                       height: 10.0,
                     ),
-                    kAuthOtpButton(
-                      context,
-                      textColor: Colors.black,
-                      bgColor: Colors.white,
-                      text: 'Sign Up',
-                      onPress: () async {
-                        if(_formKey.currentState!.validate()){
-                          final userId = await nodeApis.getUserID();
-                          if (!context.mounted) return;
-                          await nodeApis.signUp(
-                          userController.text,
-                          passwordController.text,
-                          emailController.text,
-                          userId,
-                          context);
-                          }
-                        context.push('home');
+                    kAuthOtpButton(context,
+                        textColor: Colors.black,
+                        bgColor: Colors.white,
+                        text: 'Send OTP', onPress: () async {
+                      if (_formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Sending otp')));
+                        var response = await nodeApis.sendOtp(
+                            'signup/email',
+                            '${emailController.text}@kgpian.iitkgp.ac.in',
+                            true);
 
-
+                        print('response is $response');
+                        if (response['success'] == true) {
+                          context.pushNamed('verifyotp', queryParameters: {
+                            'loginOrRegister': 'register',
+                            'nextRoute': 'signup',
+                            'isEmail': 'true',
+                            'to': '${emailController.text}@kgpian.iitkgp.ac.in',
+                          });
                         }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(response['message'])));
+
+                        // context.push('/verifyotp');
+                      }
+                    }
+
                         // context.push('/home');
-                    ),
+                        ),
                     const HorizontalOrLine(
                       label: "OR",
                       height: 4.0,
@@ -113,7 +129,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.go('/login');
+                        context.push('profile');
                       },
                       child: const Center(
                         child: Text(
@@ -142,8 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Padding kAuthPassFormField(
       String hintText, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: TextFormField(
         key: const ValueKey('password'),
         obscureText: obscureText,
@@ -158,7 +173,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   obscureText = !obscureText;
                 });
               },
-              child: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+              child:
+                  Icon(obscureText ? Icons.visibility : Icons.visibility_off),
             ),
             filled: true,
             fillColor: Colors.white.withOpacity(0.5),
@@ -341,13 +357,13 @@ class _SignupScreenState extends State<SignupScreen> {
 // //       context);
 // final userId = await nodeApis.getUserID();
 // if (!context.mounted) return;
-  // await nodeApis.signUp(
-  // userController.text,
-  // passwordController.text,
-  // emailController.text,
-  // userId,
-  // context);
-  // }
+// await nodeApis.signUp(
+// userController.text,
+// passwordController.text,
+// emailController.text,
+// userId,
+// context);
+// }
 // else{
 // setState(() {
 // isOtpMatched = false;

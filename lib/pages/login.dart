@@ -142,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     GestureDetector(
                       onTap: () {
-                        context.go('/signup');
+                        context.pushNamed('signup' , queryParameters: {'isEmailVerified' : 'false' ,
+                        'email' : '' , 'rollNo' : ''});
                       },
                       child: const Center(
                         child: Text(

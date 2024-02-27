@@ -1,4 +1,5 @@
 import 'package:csrs/pages/otpVerification.dart';
+import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/pages/welcome.dart';
 import 'package:home_widget/home_widget.dart';
@@ -26,8 +27,13 @@ final GoRouter _router = GoRouter(
       routes: <RouteBase>[
         GoRoute(
           path: 'signup',
+          name: 'signup',
           builder: (BuildContext context, GoRouterState state) {
-            return const SignupScreen();
+            return SignupScreen(
+              isEmailVerified: state.uri.queryParameters['isEmailVerified'],
+              email: state.uri.queryParameters['email'],
+              rollNo: state.uri.queryParameters['rollNo'],
+            );
           },
         ),
         GoRoute(
@@ -54,15 +60,26 @@ final GoRouter _router = GoRouter(
             return const LoginScreen();
           },
         ),
-        GoRoute(path: 'verifyotp',
+        GoRoute(
+            path: 'verifyotp',
             name: 'verifyotp',
-            builder: (BuildContext context, GoRouterState state){
-              return  OtpVerificationScreen(
-                loginOrRegister : state.uri.queryParameters['loginOrRegister'],
-                nextRoute : state.uri.queryParameters['nextRoute'],
-
+            builder: (BuildContext context, GoRouterState state) {
+              return OtpVerificationScreen(
+                loginOrRegister: state.uri.queryParameters['loginOrRegister'],
+                nextRoute: state.uri.queryParameters['nextRoute'],
+                isEmail: state.uri.queryParameters['isEmail'],
+                to: state.uri.queryParameters['to'],
+                rollNo: state.uri.queryParameters['rollNo'],
+                phone: state.uri.queryParameters['phone'],
+                isSignup: state.uri.queryParameters['isSignup'],
               );
             }),
+        GoRoute(
+            path: 'profile',
+            name: 'profile',
+            builder: (BuildContext context, GoRouterState state) {
+              return const ProfileImage();
+            })
       ],
     ),
   ],
@@ -72,7 +89,8 @@ final GoRouter _router = GoRouter(
 Future<void> interactiveCallback(Uri? data) async {
   if (data == Uri.parse('sosWidget://message?message=clicked')) {
     await HomeWidget.setAppGroupId('YOUR_GROUP_ID');
-    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+    navigatorKey.currentState
+        ?.push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
   }
 }
 
@@ -96,7 +114,8 @@ void main() async {
   initPlatform();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp()
+  runApp(
+    const MyApp()
     // MaterialApp(
     //   initialRoute: '/login',
     //   navigatorKey: navigatorKey,
@@ -119,12 +138,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-
   //Home widget Plugin start
   void _checkForWidgetLaunch() {
-    HomeWidget.initiallyLaunchedFromHomeWidget()
-        .then(_launchedFromWidget);
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
   }
 
   @override
@@ -136,9 +152,11 @@ class _MyAppState extends State<MyApp> {
 
   void _launchedFromWidget(Uri? uri) {
     if (uri == Uri.parse('sosWidget://message?message=clicked')) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
     }
   }
+
   //end
 
   @override
@@ -159,7 +177,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
 
 Future<void> initPlatform() async {
   // OneSignal.initialize('845c208f-f5ea-410a-abc5-92bfe17326fe');
