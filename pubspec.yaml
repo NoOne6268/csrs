@@ -57,9 +57,9 @@ dependencies:
   flutter_svg: ^2.0.9
   circular_countdown_timer: ^0.2.3
   popover: ^0.3.0
-#  workmanager: ^0.5.2
   image_cropper: ^4.0.1
   image_picker: ^1.0.7
+  flutter_native_contact_picker: ^0.0.6
 
 dev_dependencies:
   flutter_test:

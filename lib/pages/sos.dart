@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../services/node_authorization.dart';
+import 'package:csrs/utils/custom_widgets.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -13,48 +10,7 @@ class SosScreen extends StatefulWidget {
 }
 
 class _SosScreenState extends State<SosScreen> {
-
   late StatelessWidget emergencyList;
-
-  Future<StatelessWidget> _showContacts(BuildContext context) async {
-    NodeApis nodeApis = NodeApis();
-    bool isLoggedin = await nodeApis.checkLogin();
-    Map currentUser;
-    if(isLoggedin){
-      currentUser = await nodeApis.getCurrentUser();
-
-      var email = currentUser['email'].toString();
-      var data;
-      print('current user is ${currentUser.toString()}');
-      await nodeApis.getContacts(email).then((value) {
-        print('value is $value');
-        data = value;
-      });
-      if(data.isNotEmpty){
-        var contacts = data['data'];
-        print('contacts found $contacts');
-        print('contact is ${contacts[0]['contact'].toString()}');
-        if (!context.mounted) return Text('Error');
-        return ListView.builder(
-          itemCount: contacts.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(contacts[index]['contact'].toString()),
-            );
-          },
-        );
-      }
-      else {
-        print('you dont have any emergency contacts');
-        return Text('You dont any emergency contacts');
-      }
-    }
-    else{
-      print('you are not logged in');
-      return Text('you are not logged in');
-    }
-  }
-
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
@@ -100,37 +56,42 @@ class _SosScreenState extends State<SosScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Emergency signal Received.',
-              style: TextStyle(
-                fontSize: 30,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ksosText(
+                    showText: 'Emergency signal Received.',
+                  ),
+                  const SizedBox(height: 20,),
+                  ksosText(
+                    showText: 'Help is on the way.',
+                  ),
+                  Image.asset(
+                    'assets/help.png',
+                    height: 150,
+                  ),
+                ],
               ),
             ),
-            Text(
-              'Help is on the way.',
-              style: TextStyle(
-                fontSize: 30,
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0x99EB5151),
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(24),
+                    topLeft: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text('Your Emergency Contacts'),
+
+                  ],
+                ),
               ),
             ),
-            Image.asset(
-                'assets/help.png',
-                height: 160,
-            ),
-            // Expanded(
-            //   child: Container(
-            //     decoration: const BoxDecoration(
-            //       color: Color(0x66EB5151),
-            //     ),
-            //     child: Column(
-            //       children: [
-            //         Text('Your Emergency Contacts'),
-            //         emergencyList,
-            //       ],
-            //     ),
-            //   ),
-            // )
           ],
         ),
       ),

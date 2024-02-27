@@ -5,10 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
+import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:popover/popover.dart';
-import '../services/sos_widget.dart';
 import 'package:csrs/services/firebase_authorization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:csrs/services/notification.dart';
@@ -226,6 +226,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final FlutterContactPicker _contactPicker = FlutterContactPicker();
+  List<Contact>? _contacts;
+
+  _showAddWidget(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: const Color(0xFFBBE1FA),
+        title: const Center(
+            child: Text(
+          'Add Widget to Home Screen',
+          style: TextStyle(fontSize: 22),
+        )),
+        content: Steps(texts),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFF506D85),
+            ),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFFBBE1FA),
         child: ListView(
           padding: EdgeInsets.zero,
-          children:  [
+          children: [
             DrawerHeader(
               margin: EdgeInsets.zero,
               decoration: BoxDecoration(
@@ -378,20 +412,29 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: SizedBox(
         height: 136.0,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(24),
-            topLeft: Radius.circular(24),
+        child: Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(24),
+              topLeft: Radius.circular(24),
+            ),
+            color: Color(0xFF506D85),
           ),
-          child: BottomNavigationBar(
-            showUnselectedLabels: false,
-            showSelectedLabels: false,
-            backgroundColor: const Color(0xFF506D85),
-            items: [
-              kBottomNavItem('assets/widget.png', 'Add Widget'),
-              kBottomNavItem(
-                  'assets/contact.png', 'Add a Contact', size: 45),
-              kBottomNavItem('assets/add_contact.png', 'Profile'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              kBottomNavItem('assets/widget.png', 'Add Widget', onEvent: () {
+                _showAddWidget(context);
+              }),
+              kBottomNavItem('assets/contact.png', 'Add a Contact', size: 45,
+                  onEvent: () async {
+                Contact? contact = await _contactPicker.selectContact();
+                setState(() {
+                  _contacts = contact == null ? null : [contact];
+                });
+              }),
+              kBottomNavItem('assets/add_contact.png', 'Profile',
+                  onEvent: () {}),
             ],
           ),
         ),
@@ -411,8 +454,7 @@ class ListItems extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         children: [
           InkWell(
-            onTap: () {
-            },
+            onTap: () {},
             child: Container(
               height: 50,
               color: Colors.amber[100],
