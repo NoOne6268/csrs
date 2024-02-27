@@ -133,7 +133,7 @@ Padding kAuthOtpButton(BuildContext context,
 
 Padding kAuthFormField(
     TextEditingController controller, String hintText, String isEmpty,
-    {required Key key}) {
+    {required Key key, bool onLogin = false}) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
     child: TextFormField(
@@ -156,7 +156,7 @@ Padding kAuthFormField(
       controller: controller,
       decoration: InputDecoration(
           filled: true,
-          fillColor: const Color(0x80FFFFFF),
+          fillColor: (onLogin ? const Color(0x8090BDDB) : const Color(0x80FFFFFF)),
           hintText: hintText,
           hintStyle: const TextStyle(
             fontSize: 25,

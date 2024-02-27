@@ -9,7 +9,6 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:popover/popover.dart';
-import '../services/sos_widget.dart';
 import 'package:csrs/services/firebase_authorization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:csrs/services/notification.dart';
@@ -235,16 +234,23 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: const Color(0xFFBBE1FA),
-        title: const Center(child: Text('Add Widget to Home Screen', style: TextStyle(fontSize: 22),)),
+        title: const Center(
+            child: Text(
+          'Add Widget to Home Screen',
+          style: TextStyle(fontSize: 22),
+        )),
         content: Steps(texts),
         actions: <Widget>[
           TextButton(
             style: TextButton.styleFrom(
-              backgroundColor: Color(0xFF506D85),
+              backgroundColor: const Color(0xFF506D85),
             ),
-            child: const Text('OK', style: TextStyle(
-              color: Colors.white,
-            ),),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -420,13 +426,13 @@ class _HomeScreenState extends State<HomeScreen> {
               kBottomNavItem('assets/widget.png', 'Add Widget', onEvent: () {
                 _showAddWidget(context);
               }),
-              kBottomNavItem('assets/contact.png', 'Add a Contact',
-                  size: 45, onEvent: () async {
-                    Contact? contact = await _contactPicker.selectContact();
-                    setState(() {
-                      _contacts = contact == null ? null : [contact];
-                    });
-                  }),
+              kBottomNavItem('assets/contact.png', 'Add a Contact', size: 45,
+                  onEvent: () async {
+                Contact? contact = await _contactPicker.selectContact();
+                setState(() {
+                  _contacts = contact == null ? null : [contact];
+                });
+              }),
               kBottomNavItem('assets/add_contact.png', 'Profile',
                   onEvent: () {}),
             ],

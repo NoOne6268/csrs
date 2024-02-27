@@ -100,22 +100,20 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             if (value['success'] == false) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text('OTP verification failed')));
-                            }else {
-                              if(widget.isEmail == 'true') {
+                                      content:
+                                          Text('OTP verification failed')));
+                            } else {
+                              if (widget.isEmail == 'true') {
                                 context.pushNamed(widget.nextRoute!,
                                     queryParameters: {
                                       'isEmailVerified': 'true',
                                       'email': widget.to!,
                                       'rollNo': widget.rollNo!
                                     });
-                              }else {
+                              } else {
                                 context.pushNamed(widget.nextRoute!,
-                                    queryParameters: {
-                                      'phone' : '${widget.to}'
-                                    });
+                                    queryParameters: {'phone': '${widget.to}'});
                               }
-
                             }
                           });
                         } else {
@@ -129,7 +127,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             if (value['success'] == false) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text('OTP verification failed')));
+                                      content:
+                                          Text('OTP verification failed')));
                             } else {
                               context.pushNamed(widget.nextRoute!,
                                   queryParameters: {

@@ -11,8 +11,6 @@ class SosScreen extends StatefulWidget {
 
 class _SosScreenState extends State<SosScreen> {
   late StatelessWidget emergencyList;
-
-
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
@@ -66,12 +64,13 @@ class _SosScreenState extends State<SosScreen> {
                   ksosText(
                     showText: 'Emergency signal Received.',
                   ),
+                  const SizedBox(height: 20,),
                   ksosText(
                     showText: 'Help is on the way.',
                   ),
                   Image.asset(
                     'assets/help.png',
-                    height: 160,
+                    height: 150,
                   ),
                 ],
               ),
@@ -85,7 +84,12 @@ class _SosScreenState extends State<SosScreen> {
                     topLeft: Radius.circular(24),
                   ),
                 ),
+                child: Column(
+                  children: [
+                    Text('Your Emergency Contacts'),
 
+                  ],
+                ),
               ),
             ),
           ],

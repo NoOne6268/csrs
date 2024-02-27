@@ -70,11 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      child: kAuthFormField(emailController , isPhone ? 'Phone No' : 'Institute Email', 'email can\'t be empty' , key: const ValueKey('email')),
-                    ),
+                    kAuthFormField(
+                        emailController,
+                        isPhone ? 'Phone No' : 'Institute Email',
+                        'email can\'t be empty',
+                        key: const ValueKey('email'),
+                        onLogin: true),
                     const SizedBox(
                       height: 25.0,
                     ),
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         bgColor: const Color(0xFF90BDDB),
                         text: 'Send OTP',
                         onPress: () {
-                          if(_formKey.currentState!.validate()){
+                          if (_formKey.currentState!.validate()) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Processing Data'),
@@ -100,7 +101,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             //   passwordController.text,
                             //   context,
                             // );
-                            context.goNamed('verifyotp', queryParameters: {'loginOrRegister' : 'login', 'nextRoute' : '/login'});
+                            context.goNamed('verifyotp', queryParameters: {
+                              'loginOrRegister': 'login',
+                              'nextRoute': '/login'
+                            });
                           }
                         },
                       ),
@@ -114,10 +118,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           isPhone = !isPhone;
                         });
                       },
-                      child:  Center(
+                      child: Center(
                         child: Text(
-                          isPhone ? 'Login Through Insti Email' :
-                          'Login Through Phone Number',
+                          isPhone
+                              ? 'Login Through Insti Email'
+                              : 'Login Through Phone Number',
                           style: const TextStyle(
                             fontSize: 25,
                             shadows: [
@@ -129,21 +134,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20.0,
-
                     ),
                     const HorizontalOrLine(
                       label: "OR",
                       height: 10.0,
                       color: Colors.black,
                     ),
-
-
                     GestureDetector(
                       onTap: () {
-                        context.pushNamed('signup' , queryParameters: {'isEmailVerified' : 'false' ,
-                        'email' : '' , 'rollNo' : ''});
+                        context.pushNamed('signup', queryParameters: {
+                          'isEmailVerified': 'false',
+                          'email': '',
+                          'rollNo': ''
+                        });
                       },
                       child: const Center(
                         child: Text(
