@@ -57,26 +57,27 @@ class HorizontalOrLine extends StatelessWidget {
 TextStyle kHighlightTextStyle = const TextStyle(
     color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold);
 
-BottomNavigationBarItem kBottomNavItem(String iconPath, title,
-    {double size = 40}) {
-  return BottomNavigationBarItem(
-    icon: GestureDetector(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            iconPath,
-            height: size,
-          ),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 15.0),
-          )
-        ],
-      ),
-    ),
-    label: title,
+Widget kBottomNavItem(
+  String iconPath,
+  title, {
+  double size = 40,
+  required void Function() onEvent,
+}) {
+  return IconButton(
+    icon: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          iconPath,
+          height: size,
+        ),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 15.0),
+        )
+      ],
+    ), onPressed: onEvent,
   );
 }
 
@@ -105,7 +106,7 @@ TextField kAuthTextField(String hintText, TextEditingController controller) {
 Padding kAuthOtpButton(BuildContext context,
     {required Color textColor,
     required Color bgColor,
-      required String text,
+    required String text,
     required void Function()? onPress}) {
   return Padding(
     padding: const EdgeInsets.symmetric(
@@ -131,10 +132,10 @@ Padding kAuthOtpButton(BuildContext context,
 }
 
 Padding kAuthFormField(
-    TextEditingController controller, String hintText, String isEmpty, {required Key key}) {
+    TextEditingController controller, String hintText, String isEmpty,
+    {required Key key}) {
   return Padding(
-    padding: const EdgeInsets.symmetric(
-        horizontal: 16.0, vertical: 8.0),
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
     child: TextFormField(
       key: key,
       validator: (value) {
@@ -151,7 +152,6 @@ Padding kAuthFormField(
             blurRadius: 2.0,
           ),
         ],
-
       ),
       controller: controller,
       decoration: InputDecoration(
@@ -162,12 +162,11 @@ Padding kAuthFormField(
             fontSize: 25,
           ),
           suffixText:
-            hintText == 'Insti mail' ? '@kgpian.iitkgp.ac.in' : '',
+              hintText == 'Institute mail' ? '@kgpian.iitkgp.ac.in' : '',
           suffixStyle: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 23,
           ),
-
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Colors.white),
@@ -178,4 +177,60 @@ Padding kAuthFormField(
           )),
     ),
   );
+}
+
+Text ksosText({required String showText}) {
+  return Text(
+    showText,
+    style: const TextStyle(
+      fontSize: 30,
+    ),
+  );
+}
+
+List<String> texts = [
+  'Go to Home Screen.',
+  'Tap and hold an on empty region.',
+  'Select Widgets.',
+  'Scroll down to find CSRS.',
+  'Select the Emergency Button widget.'
+];
+
+class Steps extends StatelessWidget {
+  Steps(this.texts, {super.key});
+  final List<String> texts;
+
+  @override
+  Widget build(BuildContext context) {
+    var widgetList = <Widget>[];
+    var cnt = texts.length;
+    for (int i = 0; i < cnt; i++) {
+      // Add list item
+      widgetList.add(Step(texts[i], i));
+      // Add space between items
+      widgetList.add(const SizedBox(height: 5.0));
+    }
+
+    return Column(mainAxisSize: MainAxisSize.min,
+        children: widgetList);
+  }
+}
+
+class Step extends StatelessWidget {
+  const Step(this.text, this.index, {super.key});
+  final String text;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text("${index + 1} "),
+        Expanded(
+          child: Text(text),
+        ),
+      ],
+    );
+  }
 }
