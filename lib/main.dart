@@ -1,3 +1,4 @@
+import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/sos.dart';
@@ -22,7 +23,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const WelcomeScreen();
+        return const ContactScreen();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -75,11 +76,17 @@ final GoRouter _router = GoRouter(
               );
             }),
         GoRoute(
-            path: 'profile',
-            name: 'profile',
-            builder: (BuildContext context, GoRouterState state) {
-              return const ProfileImage();
-            })
+          path: 'profile',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileImage();
+          },
+        ),
+        GoRoute(
+          path: 'contacts',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ContactScreen();
+          },
+        ),
       ],
     ),
   ],

@@ -64,13 +64,27 @@ class _SosScreenState extends State<SosScreen> {
                   ksosText(
                     showText: 'Emergency signal Received.',
                   ),
-                  const SizedBox(height: 20,),
+                  SizedBox(height: 20,),
                   ksosText(
                     showText: 'Help is on the way.',
                   ),
                   Image.asset(
                     'assets/help.png',
                     height: 150,
+                  ),
+                  SizedBox(height: 20,),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF7ACAA6),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      'Safe now',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -86,8 +100,25 @@ class _SosScreenState extends State<SosScreen> {
                 ),
                 child: Column(
                   children: [
-                    Text('Your Emergency Contacts'),
-
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Center(
+                        child: Text(
+                          'Your Emergency Contacts',
+                          style: kHighlightTextStyle,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: 5,
+                        itemBuilder: (BuildContext context, int index) {
+                          return kContactTile(
+                              name: 'Name', imageUri: null, phoneNo: '1234567890');
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -97,4 +128,6 @@ class _SosScreenState extends State<SosScreen> {
       ),
     );
   }
+
+
 }

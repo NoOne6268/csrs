@@ -5,10 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
-import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:popover/popover.dart';
 import 'package:csrs/services/firebase_authorization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:csrs/services/notification.dart';
@@ -226,9 +224,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final FlutterContactPicker _contactPicker = FlutterContactPicker();
-  List<Contact>? _contacts;
-
   _showAddWidget(BuildContext context) {
     return showDialog(
       context: context,
@@ -427,11 +422,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showAddWidget(context);
               }),
               kBottomNavItem('assets/contact.png', 'Add a Contact', size: 45,
-                  onEvent: () async {
-                Contact? contact = await _contactPicker.selectContact();
-                setState(() {
-                  _contacts = contact == null ? null : [contact];
-                });
+                  onEvent: () {
+                context.push('/contacts');
               }),
               kBottomNavItem('assets/add_contact.png', 'Profile',
                   onEvent: () {}),

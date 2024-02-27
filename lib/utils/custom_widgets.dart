@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class HorizontalOrLine extends StatelessWidget {
   const HorizontalOrLine({
@@ -183,7 +184,8 @@ Text ksosText({required String showText}) {
   return Text(
     showText,
     style: const TextStyle(
-      fontSize: 30,
+      fontSize: 25.0,
+      fontWeight: FontWeight.bold,
     ),
   );
 }
@@ -234,3 +236,50 @@ class Step extends StatelessWidget {
     );
   }
 }
+
+Padding kContactTile({required String name, required Uri? imageUri, required String phoneNo}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 5.0),
+    child: Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(50),
+            child: (imageUri == null ? Image.asset(
+            'assets/static_profile.png',
+                height: 55,
+            ) : Image.network(imageUri.toString())),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              name,
+              style: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.call_outlined,
+            size: 40,
+          ),
+          onPressed: () async {
+            bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNo);
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+List<Padding> contacts = [
+  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+];
