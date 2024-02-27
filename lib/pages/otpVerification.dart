@@ -9,7 +9,7 @@ class OtpVerificationScreen extends StatefulWidget {
       this.loginOrRegister,
       this.nextRoute,
       this.isEmail,
-      this.to,
+      this.email,
       this.rollNo,
       this.phone,
       this.isSignup});
@@ -17,7 +17,7 @@ class OtpVerificationScreen extends StatefulWidget {
   final String? loginOrRegister;
   final String? nextRoute;
   final String? isEmail;
-  final String? to;
+  final String? email;
   final String? rollNo;
   final String? phone;
   final String? isSignup;
@@ -87,76 +87,55 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         bgColor: Colors.black,
                         text: widget.loginOrRegister!, onPress: () {
                       if (_formKey.currentState!.validate()) {
-                        print('to is ${widget.to!}');
+                        // print('to is ${widget.email!} ${widget.phone!}');
                         print('isEmail is ${widget.isEmail!}');
-                        if (widget.isSignup == 'true') {
+                        if (widget.nextRoute == 'signup/phone') {
                           nodeApis
-                              .verifyOtp(
-                                  'signup/verify',
-                                  widget.to!,
-                                  otpController.text,
-                                  widget.isEmail! == 'true' ? true : false)
+                              .verifyOtp('signup/verify', widget.email!,
+                                  otpController.text, true)
                               .then((value) {
-                            if (value['success'] == false) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('OTP verification failed')));
-                            }else {
-                              if(widget.isEmail == 'true') {
-                                context.pushNamed(widget.nextRoute!,
-                                    queryParameters: {
-                                      'isEmailVerified': 'true',
-                                      'email': widget.to!,
-                                      'rollNo': widget.rollNo!
-                                    });
-                              }else {
-                                context.pushNamed(widget.nextRoute!,
-                                    queryParameters: {
-                                      'phone' : '${widget.to}'
-                                    });
-                              }
-
-                            }
-                          });
-                        } else {
-                          nodeApis
-                              .verifyOtp(
-                                  'login/verify',
-                                  widget.to!,
-                                  otpController.text,
-                                  widget.isEmail! == 'true' ? true : false)
-                              .then((value) {
-                            if (value['success'] == false) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('OTP verification failed')));
-                            } else {
-                              context.pushNamed(widget.nextRoute!,
-                                  queryParameters: {
-                                    'isEmailVerified': 'true',
-                                    'email': widget.to,
-                                    'rollNo': widget.rollNo
-                                  });
+                            print('value is $value');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('${value['message']}')));
+                            print('value of succes is , ${value['success']}');
+                            if (value['success'] == true) {
+                              context
+                                  .pushNamed('signup/phone', queryParameters: {
+                                'email': widget.email!,
+                                'rollNo': widget.rollNo!,
+                              });
                             }
                           });
                         }
-                        nodeApis
-                            .verifyOtp(
-                                'signup/verify',
-                                '${widget.to!}@kgpian.iitkgp.ac.in',
-                                otpController.text,
-                                widget.isEmail! == 'true' ? true : false)
-                            .then((value) {
-                          if (value['success'] == false) {
-                            print('otp verification failed');
-                          }
-                          context
-                              .pushNamed(widget.nextRoute!, queryParameters: {
-                            'isEmailVerified': 'true',
-                            'email': '${widget.to}@kgpian.iitkgp.ac.in',
-                            'rollNo': '${widget.rollNo}'
+                        else if (widget.nextRoute == 'home') {
+                          print('otp is ${otpController.text}');
+
+                          String to = widget.isEmail == 'true'
+                              ? widget.email!
+                              : widget.phone!;
+                          bool isEmail =
+                              widget.isEmail == 'true' ? true : false;
+                          nodeApis
+                              .verifyOtp(
+                                  'login/verify', to, otpController.text, isEmail)
+                              .then((value) {
+                            print('value is $value');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('${value['message']}')));
+                            if(value['success'] == true) {
+                              context.push('/home');
+                            }
                           });
-                        });
+                        }
+                        else if (widget.nextRoute == 'profile') {
+                          nodeApis
+                              .signUp('setyourname', widget.rollNo!,
+                                  widget.email!, widget.phone!, context)
+                              .then((value) {
+                            print('sign up api is called');
+                          });
+                          context.push('/profile');
+                        }
                         // context.go('/home');
                       }
                     })

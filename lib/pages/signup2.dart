@@ -5,21 +5,21 @@ import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({
-    super.key,
-  });
+class SignupScreen2 extends StatefulWidget {
+  const SignupScreen2({super.key, this.email, this.rollNo});
+
+  final String? email;
+  final String? rollNo;
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<SignupScreen2> createState() => _SignupScreen2State();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
-  // AuthService authService = AuthService();
+class _SignupScreen2State extends State<SignupScreen2> {
   NodeApis nodeApis = NodeApis();
+  bool obscureText = true;
   final _formKey = GlobalKey<FormState>();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController rollNoController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +64,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       height: 20,
                     ),
                     kAuthFormField(
-                      rollNoController,
-                      'Roll No',
-                      'Name cannot be empty',
-                      key: const ValueKey('username'),
-                    ),
-                    kAuthFormField(
-                        emailController, 'Insti mail', 'Email cannot be empty.',
-                        key: const ValueKey('email')),
+                        phoneController, 'Phone No', 'phone can not be empty',
+                        key: const ValueKey('phone')),
                     const SizedBox(
                       height: 10.0,
                     ),
@@ -79,30 +73,29 @@ class _SignupScreenState extends State<SignupScreen> {
                         textColor: Colors.black,
                         bgColor: Colors.white,
                         text: 'Send OTP', onPress: () async {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Sending otp')));
-                        var response = await nodeApis.sendOtp(
-                            'signup/email',
-                            '${emailController.text}@kgpian.iitkgp.ac.in',
-                            true);
+                          if (_formKey.currentState!.validate()) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Sending otp')));
 
-                        print('response is $response');
-                        if (response['success'] == true) {
-                          context.pushNamed('verifyotp', queryParameters: {
-                            'loginOrRegister': 'register',
-                            'nextRoute': 'signup/phone',
-                            'isEmail': 'true',
-                            'to': '${emailController.text}@kgpian.iitkgp.ac.in',
-                            'isSignup': 'true',
-                            'rollNo': rollNoController.text,
-                            'email' : '${emailController.text}@kgpian.iitkgp.ac.in',
-                          });
-                        }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(response['message'])));
-                      }
-                    }),
+                            var response = await nodeApis.sendOtp(
+                                'signup/phone', phoneController.text, false);
+                            print('response is $response');
+                            if (response['success'] == true) {
+                              context.pushNamed('verifyotp', queryParameters: {
+                                'loginOrRegister': 'register',
+                                'nextRoute': 'profile',
+                                'isEmail': 'false',
+                                'to': phoneController.text,
+                                'isSignup': 'true',
+                                'rollNo': widget.rollNo!,
+                                'email': widget.email!,
+                                'phone' : phoneController.text,
+                              });
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(response['message'])));
+                          }
+                        }),
                     const HorizontalOrLine(
                       label: "OR",
                       height: 4.0,
@@ -110,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.push('/login');
+                        context.push('profile');
                       },
                       child: const Center(
                         child: Text(
@@ -135,4 +128,5 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
+
 }

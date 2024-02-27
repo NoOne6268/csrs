@@ -10,17 +10,12 @@ var currentUser = '';
 var currentEmail = '';
   Location location = Location();
   final String baseUrl = 'https://csrs-server-3928af365723.herokuapp.com';
-  Future<String> getUserID() async{
+  Future<String?> getUserID() async{
     String? userID;
     try {
       OneSignal.shared.getDeviceState().then((value) {
-        if(value!.userId == null){
-          userID = 'couldn\'t get userID';
-        }else{
-          userID = value.userId!;
-          userID.toString().isEmpty ? userID = 'couldn\'t get userID' : userID = value.userId;
-        }
-        print('device state is got in signup function is :  ${value.userId}');
+        print('user id is : ${value!.userId} , and device state is ${value.jsonRepresentation()}');
+        userID = value.userId;
       });
       return userID.toString();
     } catch (e) {
@@ -29,10 +24,12 @@ var currentEmail = '';
     }
   }
 
-  Future<void> signUp(String username, String password, String email,String userID ,
+  Future<void> signUp(String username, String rollNo, String email,String phone,
       BuildContext context) async {
 
     try {
+      String? userID = await getUserID();
+      print('user id is $userID');
       if (!context.mounted) return;
       final response = await http.post(
         Uri.parse('$baseUrl/signup'),
@@ -41,9 +38,10 @@ var currentEmail = '';
         },
         body: jsonEncode(<dynamic, dynamic>{
           'username': username,
-          'password': password,
+          'rollNo': rollNo,
           'email': email,
-          'userID':  userID ,
+          'userId':  userID ,
+          'phone' : phone
         }),
       );
       print('this is response body : ${response.body}');
@@ -152,7 +150,7 @@ var currentEmail = '';
     }
     catch(e){
       print(e);
-      return {};
+      return { 'message' : 'error : $e '};
     }
 }
 Future<Map> verifyOtp(String route , String to, String otp, bool isEmail)async {
