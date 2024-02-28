@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:csrs/pages/home.dart';
 import 'package:go_router/go_router.dart';
 
+import '../utils/custom_widgets.dart';
+
 class CountdownScreen extends StatefulWidget {
   const CountdownScreen({super.key});
 
@@ -15,38 +17,9 @@ class _CountdownScreenState extends State<CountdownScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
-        child: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.white,
-              size: 35,
-            ),
-            onPressed: () => context.pop(),
-          ),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: const Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.white,
-                  size: 35,
-                ),
-              ),
-            )
-          ],
-          backgroundColor: const Color(0xFFEB5151),
-        ),
+      appBar: kBackAppbar(
+        context,
+        color: const Color(0xFFEB5151),
       ),
       body: Center(
         child: Column(

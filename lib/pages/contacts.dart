@@ -13,89 +13,26 @@ class ContactScreen extends StatefulWidget {
 
 class _ContactScreenState extends State<ContactScreen> {
   final FlutterContactPicker _contactPicker = FlutterContactPicker();
-  List<Contact>? _contacts;
 
-  _addContact(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: const Color(0xFFBBE1FA),
-        title: const Center(
-            child: Text(
-          'Add Contact',
-          style: TextStyle(
-            fontSize: 22,
-          ),
-        )),
-        content: TextField(
+  void takeContact(Contact contact) {
+    String? name = contact.fullName;
+    String? phoneNo = contact.phoneNumbers?[0];
 
-        ),
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFF506D85),
-            ),
-            child: const Text(
-              'Add',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () {
-              // TODO: Add backend function
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+    // TODO: Add backend function
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(75.0),
-        child: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.white,
-              size: 35,
-            ),
-            onPressed: () => context.pop(),
-          ),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-            ),
-          ),
-          title: const Center(
-            child: Text(
-              'Your Contacts',
-              style: TextStyle(color: Colors.white, fontSize: 27),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: const Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.white,
-                  size: 35,
-                ),
-              ),
-            )
-          ],
-          backgroundColor: const Color(0xFF506D85),
-        ),
+      appBar: kBackAppbar(
+        context,
+        color: const Color(0xFF506D85),
+        isTitle: true,
+        titleText: 'Your Contacts',
       ),
       body: ListView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: 20,
+        itemCount: 5,
         itemBuilder: (BuildContext context, int index) {
           return kContactTile(
               name: 'Name', imageUri: null, phoneNo: '1234567890');
@@ -105,9 +42,7 @@ class _ContactScreenState extends State<ContactScreen> {
         backgroundColor: const Color(0xFF506D85),
         onPressed: () async {
           Contact? contact = await _contactPicker.selectContact();
-          setState(() {
-            _contacts = contact == null ? null : [contact];
-          });
+          takeContact(contact!);
         },
         child: const Icon(
           Icons.add,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:go_router/go_router.dart';
 
 class HorizontalOrLine extends StatelessWidget {
   const HorizontalOrLine({
@@ -78,7 +79,8 @@ Widget kBottomNavItem(
           style: const TextStyle(color: Colors.white, fontSize: 15.0),
         )
       ],
-    ), onPressed: onEvent,
+    ),
+    onPressed: onEvent,
   );
 }
 
@@ -157,7 +159,8 @@ Padding kAuthFormField(
       controller: controller,
       decoration: InputDecoration(
           filled: true,
-          fillColor: (onLogin ? const Color(0x8090BDDB) : const Color(0x80FFFFFF)),
+          fillColor:
+              (onLogin ? const Color(0x8090BDDB) : const Color(0x80FFFFFF)),
           hintText: hintText,
           hintStyle: const TextStyle(
             fontSize: 25,
@@ -213,8 +216,7 @@ class Steps extends StatelessWidget {
       widgetList.add(const SizedBox(height: 5.0));
     }
 
-    return Column(mainAxisSize: MainAxisSize.min,
-        children: widgetList);
+    return Column(mainAxisSize: MainAxisSize.min, children: widgetList);
   }
 }
 
@@ -237,7 +239,8 @@ class Step extends StatelessWidget {
   }
 }
 
-Padding kContactTile({required String name, required Uri? imageUri, required String phoneNo}) {
+Padding kContactTile(
+    {required String name, required Uri? imageUri, required String phoneNo}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 5.0),
     child: Row(
@@ -246,10 +249,12 @@ Padding kContactTile({required String name, required Uri? imageUri, required Str
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(50),
-            child: (imageUri == null ? Image.asset(
-            'assets/static_profile.png',
-                height: 55,
-            ) : Image.network(imageUri.toString())),
+            child: (imageUri == null
+                ? Image.asset(
+                    'assets/static_profile.png',
+                    height: 55,
+                  )
+                : Image.network(imageUri.toString())),
           ),
         ),
         Expanded(
@@ -283,3 +288,48 @@ List<Padding> contacts = [
   kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
   kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
 ];
+
+PreferredSize kBackAppbar(BuildContext context,
+    {required Color color, bool isTitle = false, String titleText = ''}) {
+  return PreferredSize(
+    preferredSize: const Size.fromHeight(75.0),
+    child: AppBar(
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_rounded,
+          color: Colors.white,
+          size: 35,
+        ),
+        onPressed: () => context.pop(),
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          bottomRight: Radius.circular(24),
+          bottomLeft: Radius.circular(24),
+        ),
+      ),
+      title: (!isTitle
+          ? null
+          : Center(
+              child: Text(
+                titleText,
+                style: const TextStyle(color: Colors.white, fontSize: 27),
+              ),
+            )),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: GestureDetector(
+            onTap: () {},
+            child: const Icon(
+              Icons.more_vert_outlined,
+              color: Colors.white,
+              size: 35,
+            ),
+          ),
+        )
+      ],
+      backgroundColor: color,
+    ),
+  );
+}

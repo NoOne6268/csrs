@@ -258,6 +258,67 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100.0),
+        child: AppBar(
+          leading: Builder(builder: (context) {
+            return IconButton(
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              icon: const Icon(
+                Icons.menu,
+                size: 35,
+                color: Colors.white,
+              ),
+            );
+          }),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(24),
+              bottomLeft: Radius.circular(24),
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: GestureDetector(
+                // onTap: () {
+                //   showPopover(
+                //     context: context,
+                //     bodyBuilder: (context) => ListView(
+                //       children: [
+                //         ListTile(
+                //           title: Text('Hello'),
+                //         ),
+                //         ListTile(
+                //           title: Text('Hello'),
+                //         ),
+                //         ListTile(
+                //           title: Text('Hello'),
+                //         ),
+                //       ],
+                //     ),
+                //     onPop: () => print('Popover was popped!'),
+                //     direction: PopoverDirection.right,
+                //     width: 200,
+                //     height: 400,
+                //     arrowHeight: 15,
+                //     arrowWidth: 30,
+                //
+                //   );
+                // },
+                child: const Icon(
+                  Icons.more_vert_outlined,
+                  color: Colors.white,
+                  size: 35,
+                ),
+              ),
+            )
+          ],
+          backgroundColor: const Color(0xFF506D85),
+        ),
+      ),
       drawer: Drawer(
         backgroundColor: const Color(0xFFBBE1FA),
         child: ListView(
@@ -324,67 +385,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       backgroundColor: const Color(0xFFBBE1FA),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
-        child: AppBar(
-          leading: Builder(builder: (context) {
-            return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: const Icon(
-                Icons.menu,
-                size: 35,
-                color: Colors.white,
-              ),
-            );
-          }),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GestureDetector(
-                // onTap: () {
-                //   showPopover(
-                //     context: context,
-                //     bodyBuilder: (context) => ListView(
-                //       children: [
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //       ],
-                //     ),
-                //     onPop: () => print('Popover was popped!'),
-                //     direction: PopoverDirection.right,
-                //     width: 200,
-                //     height: 400,
-                //     arrowHeight: 15,
-                //     arrowWidth: 30,
-                //
-                //   );
-                // },
-                child: const Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.white,
-                  size: 35,
-                ),
-              ),
-            )
-          ],
-          backgroundColor: const Color(0xFF506D85),
-        ),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -418,15 +418,28 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              kBottomNavItem('assets/widget.png', 'Add Widget', onEvent: () {
-                _showAddWidget(context);
-              }),
-              kBottomNavItem('assets/contact.png', 'Add a Contact', size: 45,
-                  onEvent: () {
-                context.push('/contacts');
-              }),
-              kBottomNavItem('assets/add_contact.png', 'Profile',
-                  onEvent: () {}),
+              kBottomNavItem(
+                'assets/widget.png',
+                'Add Widget',
+                onEvent: () {
+                  _showAddWidget(context);
+                },
+              ),
+              kBottomNavItem(
+                'assets/contact.png',
+                'Contacts',
+                size: 45,
+                onEvent: () {
+                  context.push('/contacts');
+                },
+              ),
+              kBottomNavItem(
+                'assets/add_contact.png',
+                'Profile',
+                onEvent: () {
+                  context.push('/profile');
+                },
+              ),
             ],
           ),
         ),
@@ -492,7 +505,7 @@ _initiateSOSAlert(BuildContext context, int time) async {
               color: Colors.black,
             )),
         content: Container(
-          margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+          margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
           child: Text('$time',
               style: const TextStyle(
                   fontSize: 50.0,
@@ -500,7 +513,7 @@ _initiateSOSAlert(BuildContext context, int time) async {
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto')),
         ),
-        contentPadding: EdgeInsets.all(10.0),
+        contentPadding: const EdgeInsets.all(10.0),
         actions: <Widget>[
           TextButton(
             child: const Text(
