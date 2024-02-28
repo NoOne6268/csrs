@@ -97,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 content: Text('Processing Data'),
                               ),
                             );
-                            
                             if (isPhone) {
                               var response = await nodeApis.sendOtp(
                                   'login/phone', emailController.text, false);
@@ -124,10 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'nextRoute': 'home',
                                   'isEmail': 'true',
                                   'email': '${emailController.text}@kgpian.iitkgp.ac.in',
-                                },);
-                              },
-                            },
-                          },
+                                });
+                              }
+                            }
+                          }
                         },
                       ),
                     ),
