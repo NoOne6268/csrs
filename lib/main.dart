@@ -1,3 +1,4 @@
+import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
@@ -22,7 +23,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const WelcomeScreen();
+        return const HomeScreen();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -44,31 +45,35 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
           path: 'cnt',
+          name: '/cnt',
           builder: (BuildContext context, GoRouterState state) {
             return const CountdownScreen();
           },
         ),
         GoRoute(
           path: 'home',
+          name: '/home',
           builder: (BuildContext context, GoRouterState state) {
             return const HomeScreen();
           },
         ),
         GoRoute(
           path: 'sos',
+          name: '/sos',
           builder: (BuildContext context, GoRouterState state) {
             return const SosScreen();
           },
         ),
         GoRoute(
           path: 'login',
+          name: '/login',
           builder: (BuildContext context, GoRouterState state) {
             return const LoginScreen();
           },
         ),
         GoRoute(
             path: 'verifyotp',
-            name: 'verifyotp',
+            name: '/verifyotp',
             builder: (BuildContext context, GoRouterState state) {
               return OtpVerificationScreen(
                 loginOrRegister: state.uri.queryParameters['loginOrRegister'],
@@ -81,11 +86,19 @@ final GoRouter _router = GoRouter(
               );
             }),
         GoRoute(
-            path: 'profile',
-            name: 'profile',
-            builder: (BuildContext context, GoRouterState state) {
-              return const ProfileImage();
-            })
+          path: 'profile',
+          name: '/profile',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileImage();
+          },
+        ),
+        GoRoute(
+          path: 'contacts',
+          name: '/contacts',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ContactScreen();
+          },
+        ),
       ],
     ),
   ],
