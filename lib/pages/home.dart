@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:popover/popover.dart';
-import '../services/sos_widget.dart';
 import 'package:csrs/services/firebase_authorization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:csrs/services/notification.dart';
@@ -226,75 +224,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  _showAddWidget(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: const Color(0xFFBBE1FA),
+        title: const Center(
+            child: Text(
+          'Add Widget to Home Screen',
+          style: TextStyle(fontSize: 22),
+        )),
+        content: Steps(texts),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFF506D85),
+            ),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: const Color(0xFFBBE1FA),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children:  [
-            DrawerHeader(
-              margin: EdgeInsets.zero,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(24),
-                  bottomLeft: Radius.circular(24),
-                ),
-                color: Color(0xFF506D85),
-              ),
-              child: Center(
-                child: Text(
-                  'More Options',
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text('Profile'),
-              leading: Icon(
-                Icons.person,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('Settings'),
-              leading: Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('Help'),
-              leading: Icon(
-                Icons.help,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('About'),
-              leading: Icon(
-                Icons.info,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                context.go('/login');
-              },
-              title: Text('Logout'),
-              leading: Icon(
-                Icons.logout,
-                color: Colors.black,
-              ),
-            )
-          ],
-        ),
-      ),
-      backgroundColor: const Color(0xFFBBE1FA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100.0),
         child: AppBar(
@@ -356,6 +319,72 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFF506D85),
         ),
       ),
+      drawer: Drawer(
+        backgroundColor: const Color(0xFFBBE1FA),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              margin: EdgeInsets.zero,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(24),
+                  bottomLeft: Radius.circular(24),
+                ),
+                color: Color(0xFF506D85),
+              ),
+              child: Center(
+                child: Text(
+                  'More Options',
+                  style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Profile'),
+              leading: Icon(
+                Icons.person,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('Settings'),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('Help'),
+              leading: Icon(
+                Icons.help,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('About'),
+              leading: Icon(
+                Icons.info,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                context.go('/login');
+              },
+              title: Text('Logout'),
+              leading: Icon(
+                Icons.logout,
+                color: Colors.black,
+              ),
+            )
+          ],
+        ),
+      ),
+      backgroundColor: const Color(0xFFBBE1FA),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -378,20 +407,39 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: SizedBox(
         height: 136.0,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(24),
-            topLeft: Radius.circular(24),
+        child: Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(24),
+              topLeft: Radius.circular(24),
+            ),
+            color: Color(0xFF506D85),
           ),
-          child: BottomNavigationBar(
-            showUnselectedLabels: false,
-            showSelectedLabels: false,
-            backgroundColor: const Color(0xFF506D85),
-            items: [
-              kBottomNavItem('assets/widget.png', 'Add Widget'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
               kBottomNavItem(
-                  'assets/contact.png', 'Add a Contact', size: 45),
-              kBottomNavItem('assets/add_contact.png', 'Profile'),
+                'assets/widget.png',
+                'Add Widget',
+                onEvent: () {
+                  _showAddWidget(context);
+                },
+              ),
+              kBottomNavItem(
+                'assets/contact.png',
+                'Contacts',
+                size: 45,
+                onEvent: () {
+                  context.push('/contacts');
+                },
+              ),
+              kBottomNavItem(
+                'assets/add_contact.png',
+                'Profile',
+                onEvent: () {
+                  context.push('/profile');
+                },
+              ),
             ],
           ),
         ),
@@ -411,8 +459,7 @@ class ListItems extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         children: [
           InkWell(
-            onTap: () {
-            },
+            onTap: () {},
             child: Container(
               height: 50,
               color: Colors.amber[100],
@@ -458,7 +505,7 @@ _initiateSOSAlert(BuildContext context, int time) async {
               color: Colors.black,
             )),
         content: Container(
-          margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+          margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
           child: Text('$time',
               style: const TextStyle(
                   fontSize: 50.0,
@@ -466,7 +513,7 @@ _initiateSOSAlert(BuildContext context, int time) async {
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto')),
         ),
-        contentPadding: EdgeInsets.all(10.0),
+        contentPadding: const EdgeInsets.all(10.0),
         actions: <Widget>[
           TextButton(
             child: const Text(

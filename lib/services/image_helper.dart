@@ -1,20 +1,32 @@
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
-class ImageHelper {
-  ImageHelper({
-    ImagePicker? imagePicker,
-    ImageCropper? imageCropper,
-}): _imagePicker = imagePicker ?? ImagePicker(),
-    _imageCropper = imageCropper ?? ImageCropper();
+class ImageHelper extends StatefulWidget {
+  const ImageHelper({super.key});
 
-  final ImagePicker _imagePicker;
-  final ImageCropper _imageCropper;
+  @override
+  State<ImageHelper> createState() => _ImageHelperState();
+}
+
+class _ImageHelperState extends State<ImageHelper> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+
+class ImageHelper {
+
+
+  ImagePicker _imagePicker;
+  ImageCropper _imageCropper;
 
   Future<XFile?> pickImage({
-     ImageSource source = ImageSource.gallery,
-      int imageQuality = 100,
-}) async {
+    ImageSource source = ImageSource.gallery,
+    int imageQuality = 100,
+  }) async {
     return  await _imagePicker.pickImage(
       source: source,
       imageQuality: imageQuality,
@@ -23,10 +35,10 @@ class ImageHelper {
   Future<CroppedFile?> crop({
     required XFile file,
     CropStyle cropStyle = CropStyle.rectangle,
-    }) async {
+  }) async {
     return await _imageCropper.cropImage(
       sourcePath: file.path,
-        cropStyle: cropStyle,
+      cropStyle: cropStyle,
       //   aspectRatioPresets: [
       //     CropAspectRatioPreset.square,
       //     CropAspectRatioPreset.ratio3x2,
@@ -41,6 +53,4 @@ class ImageHelper {
     );
 
   }
-
-
 }

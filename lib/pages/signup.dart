@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
@@ -78,7 +76,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     kAuthOtpButton(context,
                         textColor: Colors.black,
                         bgColor: Colors.white,
-                        text: 'Send OTP', onPress: () async {
+                        text: 'Sign Up', onPress: () async {
                       if (_formKey.currentState!.validate()) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Sending otp')));

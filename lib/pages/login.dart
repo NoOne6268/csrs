@@ -71,15 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      child: kAuthFormField(
-                          emailController,
-                          isPhone ? 'Phone No' : 'Insti mail',
-                          'email can\'t be empty',
-                          key: const ValueKey('email')),
-                    ),
+                    kAuthFormField(
+                        emailController,
+                        isPhone ? 'Phone No' : 'Institute Email',
+                        'email can\'t be empty',
+                        key: const ValueKey('email'),
+                        onLogin: true),
                     const SizedBox(
                       height: 25.0,
                     ),
@@ -100,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 content: Text('Processing Data'),
                               ),
                             );
+                            
                             if (isPhone) {
                               var response = await nodeApis.sendOtp(
                                   'login/phone', emailController.text, false);
@@ -126,10 +124,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'nextRoute': 'home',
                                   'isEmail': 'true',
                                   'email': '${emailController.text}@kgpian.iitkgp.ac.in',
-                                });
-                              }
-                            }
-                          }
+                                },);
+                              },
+                            },
+                          },
                         },
                       ),
                     ),
@@ -158,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20.0,
                     ),
                     const HorizontalOrLine(

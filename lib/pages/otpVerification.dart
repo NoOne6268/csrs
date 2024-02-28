@@ -94,6 +94,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               .verifyOtp('signup/verify', widget.email!,
                                   otpController.text, true)
                               .then((value) {
+
                             print('value is $value');
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('${value['message']}')));
@@ -119,11 +120,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               .verifyOtp(
                                   'login/verify', to, otpController.text, isEmail)
                               .then((value) {
+
                             print('value is $value');
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('${value['message']}')));
                             if(value['success'] == true) {
                               context.push('/home');
+
                             }
                           });
                         }

@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../services/node_authorization.dart';
+import 'package:csrs/utils/custom_widgets.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -13,46 +10,54 @@ class SosScreen extends StatefulWidget {
 }
 
 class _SosScreenState extends State<SosScreen> {
-
   late StatelessWidget emergencyList;
 
-  Future<StatelessWidget> _showContacts(BuildContext context) async {
-    NodeApis nodeApis = NodeApis();
-    bool isLoggedin = await nodeApis.checkLogin();
-    Map currentUser;
-    if(isLoggedin){
-      currentUser = await nodeApis.getCurrentUser();
-
-      var email = currentUser['email'].toString();
-      var data;
-      print('current user is ${currentUser.toString()}');
-      await nodeApis.getContacts(email).then((value) {
-        print('value is $value');
-        data = value;
-      });
-      if(data.isNotEmpty){
-        var contacts = data['data'];
-        print('contacts found $contacts');
-        print('contact is ${contacts[0]['contact'].toString()}');
-        if (!context.mounted) return Text('Error');
-        return ListView.builder(
-          itemCount: contacts.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(contacts[index]['contact'].toString()),
-            );
-          },
-        );
-      }
-      else {
-        print('you dont have any emergency contacts');
-        return Text('You dont any emergency contacts');
-      }
-    }
-    else{
-      print('you are not logged in');
-      return Text('you are not logged in');
-    }
+  _confirmDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Center(
+            child: Text(
+              'Confirm',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,),
+            )),
+        content: const Text('Are you sure you are safe?', style: TextStyle(
+          fontSize: 20,
+        ),),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0x99EB5151),
+            ),
+            child: const Text(
+              'No',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFFEB5151),
+            ),
+            child: const Text(
+              'Yes',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            onPressed: () {
+              // TODO: Add safe now api function
+              context.goNamed('/home');
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -65,75 +70,84 @@ class _SosScreenState extends State<SosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
-        child: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.white,
-              size: 35,
-            ),
-            onPressed: () => context.pop(),
-          ),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: const Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.white,
-                  size: 35,
-                ),
-              ),
-            )
-          ],
-          backgroundColor: const Color(0xFFEB5151),
-        ),
-      ),
+      appBar: kBackAppbar(context, color: const Color(0xFFEB5151),),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Emergency signal Received.',
-              style: TextStyle(
-                fontSize: 30,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ksosText(
+                    showText: 'Emergency signal Received.',
+                  ),
+                  SizedBox(height: 20,),
+                  ksosText(
+                    showText: 'Help is on the way.',
+                  ),
+                  Image.asset(
+                    'assets/help.png',
+                    height: 150,
+                  ),
+                  const SizedBox(height: 20,),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 6.0,
+                      backgroundColor: Color(0xFF7ACAA6),
+                    ),
+                    onPressed: () {
+                      _confirmDialog(context);
+                    },
+                    child: const Text(
+                      'Safe now',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 25,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              'Help is on the way.',
-              style: TextStyle(
-                fontSize: 30,
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0x99EB5151),
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(24),
+                    topLeft: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Center(
+                        child: Text(
+                          'Your Emergency Contacts',
+                          style: kHighlightTextStyle,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: 5,
+                        itemBuilder: (BuildContext context, int index) {
+                          return kContactTile(
+                              name: 'Name', imageUri: null, phoneNo: '1234567890');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Image.asset(
-                'assets/help.png',
-                height: 160,
-            ),
-            // Expanded(
-            //   child: Container(
-            //     decoration: const BoxDecoration(
-            //       color: Color(0x66EB5151),
-            //     ),
-            //     child: Column(
-            //       children: [
-            //         Text('Your Emergency Contacts'),
-            //         emergencyList,
-            //       ],
-            //     ),
-            //   ),
-            // )
           ],
         ),
       ),
     );
   }
+
+
 }
