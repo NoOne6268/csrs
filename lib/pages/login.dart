@@ -125,9 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'isEmail': 'true',
                                   'email': '${emailController.text}@kgpian.iitkgp.ac.in',
                                 },);
-                              },
-                            },
-                          },
+                              }
+                            }
+                          }
                         },
                       ),
                     ),
