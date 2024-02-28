@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -89,23 +90,44 @@ class _LoginScreenState extends State<LoginScreen> {
                         textColor: Colors.black,
                         bgColor: const Color(0xFF90BDDB),
                         text: 'Send OTP',
-                        onPress: () {
+                        onPress: () async {
                           if (_formKey.currentState!.validate()) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Processing Data'),
                               ),
                             );
-                            // nodeApis.logIn(
-                            //   emailController.text,
-                            //   passwordController.text,
-                            //   context,
-                            // );
-                            context.goNamed('verifyotp', queryParameters: {
-                              'loginOrRegister': 'login',
-                              'nextRoute': '/login'
-                            });
-                          }
+                            
+                            if (isPhone) {
+                              var response = await nodeApis.sendOtp(
+                                  'login/phone', emailController.text, false);
+                              print('response is $response');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Sending otp')));
+                              if (response['success'] == true) {
+                                context.goNamed('verifyotp', queryParameters: {
+                                  'loginOrRegister': 'login',
+                                  'nextRoute': 'home',
+                                  'isEmail': 'false',
+                                  'phone': emailController.text,
+                                });
+                              }
+                            } else {
+                              var response = await nodeApis.sendOtp(
+                                  'login/email', '${emailController.text}@kgpian.iitkgp.ac.in', true);
+                              print('response is $response');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Sending otp')));
+                              if (response['success'] == true) {
+                                context.goNamed('verifyotp', queryParameters: {
+                                  'loginOrRegister': 'login',
+                                  'nextRoute': 'home',
+                                  'isEmail': 'true',
+                                  'email': '${emailController.text}@kgpian.iitkgp.ac.in',
+                                },);
+                              },
+                            },
+                          },
                         },
                       ),
                     ),
@@ -144,11 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.pushNamed('signup', queryParameters: {
-                          'isEmailVerified': 'false',
-                          'email': '',
-                          'rollNo': ''
-                        });
+                        context.push('/signup/email');
                       },
                       child: const Center(
                         child: Text(

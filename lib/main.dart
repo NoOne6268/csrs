@@ -1,6 +1,7 @@
 import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/profile_image.dart';
+import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/pages/welcome.dart';
 import 'package:home_widget/home_widget.dart';
@@ -10,7 +11,6 @@ import 'package:csrs/pages/signup.dart';
 import 'package:csrs/pages/login.dart';
 import 'package:csrs/pages/home.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:csrs/pages/countdown_timer.dart';
 import 'package:go_router/go_router.dart';
@@ -27,11 +27,17 @@ final GoRouter _router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-          path: 'signup',
-          name: '/signup',
+          path: 'signup/email',
+          name: 'signup/email',
           builder: (BuildContext context, GoRouterState state) {
-            return SignupScreen(
-              isEmailVerified: state.uri.queryParameters['isEmailVerified'],
+            return SignupScreen();
+          },
+        ),
+        GoRoute(
+          path: 'signup/phone',
+          name: 'signup/phone',
+          builder: (BuildContext context, GoRouterState state) {
+            return SignupScreen2(
               email: state.uri.queryParameters['email'],
               rollNo: state.uri.queryParameters['rollNo'],
             );
@@ -73,7 +79,7 @@ final GoRouter _router = GoRouter(
                 loginOrRegister: state.uri.queryParameters['loginOrRegister'],
                 nextRoute: state.uri.queryParameters['nextRoute'],
                 isEmail: state.uri.queryParameters['isEmail'],
-                to: state.uri.queryParameters['to'],
+                email: state.uri.queryParameters['email'],
                 rollNo: state.uri.queryParameters['rollNo'],
                 phone: state.uri.queryParameters['phone'],
                 isSignup: state.uri.queryParameters['isSignup'],
