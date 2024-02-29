@@ -2,14 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:csrs/services/image_helper.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:csrs/services/node_authorization.dart';
-
-final imageHelper = ImageHelper();
+import 'package:image_picker/image_picker.dart';
+import 'package:csrs/services/firebase_helper.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ProfileImage extends StatefulWidget {
   const ProfileImage({super.key});
+
   // final String initials;
   @override
   State<ProfileImage> createState() => _ProfileImageState();
@@ -19,7 +20,15 @@ class _ProfileImageState extends State<ProfileImage> {
   File? _image;
   final _formKey = GlobalKey<FormState>();
   NodeApis nodeApis = NodeApis();
-
+  bool isLoading = false;
+  String image = '';
+  late final ImagePicker _picker;
+  XFile? xFile;
+@override
+  void initState() {
+    super.initState();
+    _picker = ImagePicker();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,39 +60,81 @@ class _ProfileImageState extends State<ProfileImage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Center(
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: CircleAvatar(
-                      radius: 64,
-                      backgroundColor: Colors.grey[300],
-                      foregroundImage: _image != null
-                          ? FileImage(_image!)
-                          : Image.asset(
-                              'assets/static_profile.jpg',
-                              semanticLabel: "profile",
-                              colorBlendMode: BlendMode.lighten,
-                              fit: BoxFit.cover,
-                            ).image,
-                      child: null
-                      // _image == null
-                      //     ? Image.asset(
-                      //    'assets/images/profile.png',
-                      // )
-                      //     : null,
-
+                child: CircleAvatar(
+                  radius: 100,
+                  child: InkWell(
+                    onTap: () async {
+                      isLoading = true;
+                      setState(() {});
+                      // take gallery permission if not given
+                      if(await Permission.camera.isDenied) {
+                        await Permission.camera.request();
+                      }
+                      xFile =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                      if (xFile != null) {
+                        setState(() {});
+                  
+                        ///Upload to fire storage
+                        final String? url =
+                        await FirebaseHelper.uploadImage(File(xFile!.path));
+                  
+                        if (url != null) {
+                          image = url;
+                          isLoading = false;
+                          setState(() {});
+                          return;
+                        }
+                      }
+                  
+                      isLoading = false;
+                      setState(() {});
+                    },
+                    child: CircleAvatar(
+                      radius: 50,
+                      child: Container(
+                        height: 300,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          border: Border.all(width: 8, color: Colors.black12),
+                          borderRadius: BorderRadius.circular(12.0),
+                          image: xFile?.path != null
+                              ? DecorationImage(
+                            image: FileImage(
+                              File(xFile!.path),
+                            ),
+                            fit: BoxFit.cover,
+                          )
+                              : null,
+                        ),
+                        child: xFile?.path != null
+                            ? null
+                            : const Center(
+                          child: Icon(Icons.photo),
+                        ),
                       ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(
                 height: 10,
               ),
-              TextButton(
-                onPressed: () async {
-                  final file = await imageHelper.pickImage();
-
-                },
-                child: const Text("upload profile"),
-              ),
+              // TextButton(
+              //   onPressed: () async {
+              //
+              //     final file = await imageHelper.pickImage();
+              //     if(file != null){
+              //       final cropFile = await imageHelper.crop(file: file , cropStyle: CropStyle.circle);
+              //       if(cropFile != null){
+              //         setState(() {
+              //           _image = File(cropFile.path);
+              //         });
+              //       }
+              //     }
+              //   }, child: const Text("upload profile"),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -102,34 +153,21 @@ class _ProfileImageState extends State<ProfileImage> {
                         return 'Please enter your name';
                       }
                       return null;
-                    }),
+                    }
+                ),
               ),
               const SizedBox(
                 height: 10,
               ),
               MaterialButton(
-                // style: ElevatedButton.styleFrom(
-                //   primary: Colors.lightGreenAccent,
-                //
-                // ),
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    if (_image == null) {
-                      setState(() {
-                        _image = File('assets/images/5939837.jpg');
-                      });
-                    }
-                    // nodeApis.updateProfile(_image!, "email");
-                    // Navigator.pushNamed(context, '/home');
-                  }
-                  // Navigator.pushNamed(context, '/home');
                 },
                 child: const Text('Save'),
               )
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:csrs/services/local_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -64,6 +65,7 @@ class _SosScreenState extends State<SosScreen> {
   void initState() {
     // emergencyList = await _showContacts(context);
     super.initState();
+    LocalNotificationService.showLocalNotification('SOS is ON!!', 'Help is on the way.');
   }
 
   @override
@@ -98,6 +100,7 @@ class _SosScreenState extends State<SosScreen> {
                     onPressed: () {
                       _confirmDialog(context);
                     },
+
                     child: const Text(
                       'Safe now',
                       style: TextStyle(

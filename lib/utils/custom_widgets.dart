@@ -1,3 +1,6 @@
+import 'package:csrs/services/contact_services.dart';
+import 'package:csrs/utils/custom_dialogue_boxes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
@@ -165,8 +168,7 @@ Padding kAuthFormField(
           hintStyle: const TextStyle(
             fontSize: 25,
           ),
-          suffixText:
-              hintText == 'Institute mail' ? '@kgpian.iitkgp.ac.in' : '',
+          suffixText: hintText == 'Insti mail' ? '@kgpian.iitkgp.ac.in' : '',
           suffixStyle: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 23,
@@ -203,6 +205,7 @@ List<String> texts = [
 
 class Steps extends StatelessWidget {
   Steps(this.texts, {super.key});
+
   final List<String> texts;
 
   @override
@@ -222,6 +225,7 @@ class Steps extends StatelessWidget {
 
 class Step extends StatelessWidget {
   const Step(this.text, this.index, {super.key});
+
   final String text;
   final int index;
 
@@ -240,9 +244,9 @@ class Step extends StatelessWidget {
 }
 
 Padding kContactTile(
-    {required String name, required Uri? imageUri, required String phoneNo}) {
+    {required String name, required Uri? imageUri, required String phoneNo  }) {
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 5.0),
+    padding: const EdgeInsets.symmetric(vertical: 10.0),
     child: Row(
       children: [
         Padding(
@@ -278,16 +282,26 @@ Padding kContactTile(
             bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNo);
           },
         ),
+        IconButton(
+          onPressed: ()async {
+            var response = await ContactServices.deleteContact("harsgara3478@gmail.com", phoneNo);
+            // kshowDialogue(context, response , response == 'true' ? 'Contact deleted successfully' : 'Failed to delete contact');
+          },
+          icon: const Icon(
+            Icons.delete_outline_outlined,
+            size: 40,
+          ),
+        )
       ],
     ),
   );
 }
 
-List<Padding> contacts = [
-  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
-  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
-  kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
-];
+// List<Padding> contacts = [
+//   kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+//   kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+//   kContactTile(name: 'Name', imageUri: null, phoneNo: '1234567890'),
+// ];
 
 PreferredSize kBackAppbar(BuildContext context,
     {required Color color, bool isTitle = false, String titleText = ''}) {

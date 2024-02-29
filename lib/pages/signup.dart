@@ -41,7 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Hero(
             tag: 'logo',
             child: Image.asset(
-              'assets/logo1.png',
+              'assets/icon_flutter.png',
               height: 175,
             ),
           ),

@@ -3,7 +3,9 @@ import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
-import 'package:csrs/pages/welcome.dart';
+import 'package:csrs/firebase_options.dart';
+import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/receive_notification.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +75,7 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
             path: 'verifyotp',
-            name: '/verifyotp',
+            name: 'verifyotp',
             builder: (BuildContext context, GoRouterState state) {
               return OtpVerificationScreen(
                 loginOrRegister: state.uri.queryParameters['loginOrRegister'],
@@ -122,31 +124,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: 'AIzaSyBHi2AzFaj6hYRytGV8Mf9faBzY4oQ2Njo',
-      appId: '1:797247438844:android:3e60af2a46960574c03c79',
-      messagingSenderId: '797247438844',
-      projectId: 'login-example-15cb0',
-      authDomain: 'login-example-15cb0.firebaseapp.com',
-    ),
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  initPlatform();
-
+  // initPlatform();
+  NotificationService.initializeNotification();
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    NotificationService.onMessage(message);
+  });
+  LocalNotificationService.setup();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    const MyApp()
-    // MaterialApp(
-    //   initialRoute: '/login',
-    //   navigatorKey: navigatorKey,
-    //   routes: {
-    //     '/signup': (context) => const SignupScreen(),
-    //     '/login': (context) => const LoginScreen(),
-    //     '/home': (context) => const HomeScreen(),
-    //     '/sos': (context) => const sosScreen(),
-    //   },
-    // ),
-    ,
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -158,6 +145,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   //Home widget Plugin start
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
   void _checkForWidgetLaunch() {
     HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
   }
@@ -180,8 +169,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    _firebaseMessaging.requestPermission();
+    _firebaseMessaging.getToken().then((value) => print('FCM token is $value'));
     HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     HomeWidget.registerInteractivityCallback(interactiveCallback);
+
     super.initState();
   }
 
@@ -198,15 +190,6 @@ class _MyAppState extends State<MyApp> {
 }
 
 Future<void> initPlatform() async {
-  // OneSignal.initialize('845c208f-f5ea-410a-abc5-92bfe17326fe');
-  // OneSignal.Notifications.requestPermission(true);
-  // OneSignal.Notifications.addClickListener((event) {
-  //    print('clicked');
-  //    print('event is ${event.notification.additionalData}');
-  //    print('event is ${event.notification.body}');
-  // });
-  //   print('onesignal userId is : ${OneSignal.Debug.setLogLevel()} ' );
-  // }
   OneSignal.shared.setLogLevel(OSLogLevel.debug, OSLogLevel.none);
   OneSignal.shared.setAppId('845c208f-f5ea-410a-abc5-92bfe17326fe');
   OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {

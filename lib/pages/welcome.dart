@@ -59,7 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Hero(
                   tag: 'logo',
                   child: Image.asset(
-                      'assets/logo1.png',
+                      'assets/icon_flutter.png',
                     fit: BoxFit.fitWidth
                   ),
                 ),
