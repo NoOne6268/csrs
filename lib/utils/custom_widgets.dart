@@ -244,7 +244,7 @@ class Step extends StatelessWidget {
 }
 
 Padding kContactTile(
-    {required String name, required Uri? imageUri, required String phoneNo  }) {
+    {required String name, required String? imageUri, required String phoneNo , required void Function() ? onPress }) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 10.0),
     child: Row(
@@ -253,12 +253,12 @@ Padding kContactTile(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(50),
-            child: (imageUri == null
+            child: ((imageUri == null) || (imageUri == '' )
                 ? Image.asset(
                     'assets/static_profile.png',
                     height: 55,
                   )
-                : Image.network(imageUri.toString())),
+                : Image.network(imageUri)),
           ),
         ),
         Expanded(
@@ -283,10 +283,7 @@ Padding kContactTile(
           },
         ),
         IconButton(
-          onPressed: ()async {
-            var response = await ContactServices.deleteContact("harsgara3478@gmail.com", phoneNo);
-            // kshowDialogue(context, response , response == 'true' ? 'Contact deleted successfully' : 'Failed to delete contact');
-          },
+          onPressed: onPress,
           icon: const Icon(
             Icons.delete_outline_outlined,
             size: 40,
@@ -344,6 +341,52 @@ PreferredSize kBackAppbar(BuildContext context,
         )
       ],
       backgroundColor: color,
+    ),
+  );
+}
+Padding kProfileField(
+    {required TextEditingController controller,
+      required TextInputType inputType,
+      required void Function() onPress,
+      required bool check}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    child: TextField(
+      keyboardType: inputType,
+      style: const TextStyle(
+        fontSize: 25,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: (!check ? const Color(0x8090BDDB) : Colors.white),
+        suffix: IconButton(
+          onPressed: onPress,
+          icon: const Icon(
+            Icons.edit,
+            size: 25,
+            color: Colors.black,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Color(0x8090BDDB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Color(0x8090BDDB)),
+        ),
+      ),
+      controller: controller,
+      readOnly: check,
+    ),
+  );
+}
+
+RoundedRectangleBorder kRoundedBorder() {
+  return const RoundedRectangleBorder(
+    borderRadius: BorderRadius.only(
+      bottomRight: Radius.circular(24),
+      bottomLeft: Radius.circular(24),
     ),
   );
 }

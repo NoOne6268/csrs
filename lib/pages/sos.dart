@@ -138,7 +138,7 @@ class _SosScreenState extends State<SosScreen> {
                         itemCount: 5,
                         itemBuilder: (BuildContext context, int index) {
                           return kContactTile(
-                              name: 'Name', imageUri: null, phoneNo: '1234567890');
+                              name: 'Name', imageUri: null, phoneNo: '1234567890' , onPress: (){});
                         },
                       ),
                     ),

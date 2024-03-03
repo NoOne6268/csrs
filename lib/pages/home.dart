@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:csrs/utils/side_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter_svg/svg.dart';
@@ -115,71 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFF506D85),
         ),
       ),
-      drawer: Drawer(
-        backgroundColor: const Color(0xFFBBE1FA),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              margin: EdgeInsets.zero,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(24),
-                  bottomLeft: Radius.circular(24),
-                ),
-                color: Color(0xFF506D85),
-              ),
-              child: Center(
-                child: Text(
-                  'More Options',
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text('Profile'),
-              leading: Icon(
-                Icons.person,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('Settings'),
-              leading: Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('Help'),
-              leading: Icon(
-                Icons.help,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              title: Text('About'),
-              leading: Icon(
-                Icons.info,
-                color: Colors.black,
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                context.go('/login');
-              },
-              title: Text('Logout'),
-              leading: Icon(
-                Icons.logout,
-                color: Colors.black,
-              ),
-            )
-          ],
-        ),
-      ),
+      drawer:kSideDrawer(context),
       backgroundColor: const Color(0xFFBBE1FA),
       body: Center(
         child: Column(

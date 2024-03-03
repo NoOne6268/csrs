@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/profile_image.dart';
@@ -18,7 +20,7 @@ import 'package:csrs/pages/countdown_timer.dart';
 import 'package:go_router/go_router.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+BuildContext? backgroundContext;
 // The route configuration.
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -91,7 +93,10 @@ final GoRouter _router = GoRouter(
           path: 'profile',
           name: '/profile',
           builder: (BuildContext context, GoRouterState state) {
-            return const ProfileImage();
+            return const ProfileImage(
+              email : 'email',
+              rollNo : 'rollNo',
+            );
           },
         ),
         GoRoute(
@@ -118,6 +123,12 @@ Future<void> interactiveCallback(Uri? data) async {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+  print('message is ${message.data}');
+  print('context is $backgroundContext');
+  NotificationServices().setUpInteractMessage(backgroundContext!);
+  // _handleMessage(navigatorKey.currentContext!);
+
 }
 
 // main
@@ -126,11 +137,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // initPlatform();
-  NotificationService.initializeNotification();
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    NotificationService.onMessage(message);
-  });
+   // _handleMessage(context);
   LocalNotificationService.setup();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
@@ -169,11 +176,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    _firebaseMessaging.requestPermission();
-    _firebaseMessaging.getToken().then((value) => print('FCM token is $value'));
     HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     HomeWidget.registerInteractivityCallback(interactiveCallback);
-
+    backgroundContext = context;
+    _handleMessage(context);
     super.initState();
   }
 
@@ -209,4 +215,13 @@ Future<void> initPlatform() async {
             'user id is : ${value!.userId} , and device state is ${value.jsonRepresentation()}')
       });
   // print('something is happening');
+}
+
+void _handleMessage(BuildContext context){
+  NotificationServices _notificationServices = NotificationServices();
+  _notificationServices.requestNotificationPermission();
+  _notificationServices.firebaseInit(context);
+  _notificationServices.getToken();
+  _notificationServices.setUpInteractMessage(context);
+
 }

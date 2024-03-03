@@ -72,9 +72,9 @@ class ContactServices {
         },
       );
       print('this is response after getting the contacts ${response.body}');
-      return jsonDecode(response.toString());
+      return jsonDecode(response.body);
     } catch (e) {
-      print('error in getting contact is: ' + e.toString());
+      print(e);
       return {};
     }
   }
