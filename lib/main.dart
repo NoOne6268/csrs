@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
+import 'package:csrs/pages/edit_profile.dart';
 import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
@@ -91,11 +92,21 @@ final GoRouter _router = GoRouter(
             }),
         GoRoute(
           path: 'profile',
-          name: '/profile',
+          name: 'profile',
           builder: (BuildContext context, GoRouterState state) {
-            return const ProfileImage(
-              email : 'email',
-              rollNo : 'rollNo',
+            return  ProfileImage(
+              // email : state.uri.queryParameters['email']!,
+              // rollNo : state.uri.queryParameters['rollNo']!,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'profile/edit',
+          name: 'profile/edit',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileScreen(
+              // email : 'email',
+              // rollNo : 'rollNo',
             );
           },
         ),

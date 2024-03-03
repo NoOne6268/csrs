@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'assets/add_contact.png',
                 'Profile',
                 onEvent: () {
-                  context.push('/profile');
+                  context.push('/profile/edit');
                 },
               ),
             ],
