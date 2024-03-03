@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:csrs/services/firebase_authorization.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -14,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool obscureText = true;
   bool isPhone = false;
-  AuthService authService = AuthService();
+  // AuthService authService = AuthService();
   NodeApis nodeApis = NodeApis();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -97,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 content: Text('Processing Data'),
                               ),
                             );
+                            
                             if (isPhone) {
                               var response = await nodeApis.sendOtp(
                                   'login/phone', emailController.text, false);
@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'nextRoute': 'home',
                                   'isEmail': 'true',
                                   'email': '${emailController.text}@kgpian.iitkgp.ac.in',
-                                });
+                                },);
                               }
                             }
                           }

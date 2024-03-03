@@ -178,29 +178,7 @@ Future<Map> verifyOtp(String route , String to, String otp, bool isEmail)async {
     return {};
   }
 }
-  Future<Map<String , dynamic>> saveContact(String email, String contact) async {
-    try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/addcontact'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<dynamic, dynamic>{
-          'email': email,
-          'contact': contact,
-        }),
-      );
-      print('this is response after saving the contact ${response.body}');
-      if(response.statusCode == 200){
-        return {'message' : jsonDecode(response.body)['message'] , 'status' : true};
-      }else{
-      return {'message' : jsonDecode(response.body)['message'] , 'status' : false};
-      }
-    } catch (e) {
-      print(e);
-        return {'message' : 'error' , 'status' : false};
-    }
-  }
+
 
   Future<bool> checkLogin() async {
     if (currentEmail == '' && currentUser == '') {

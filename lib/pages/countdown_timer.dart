@@ -94,7 +94,7 @@ void ConfirmationAlert(BuildContext context) {
     actions: [
       ElevatedButton(
         onPressed: () {
-          fetchContacts(false);
+          // fetchContacts(false);
           Navigator.pushReplacementNamed(context, '/home');
         },
         child: const Text('Yes'),

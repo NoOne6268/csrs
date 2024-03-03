@@ -53,7 +53,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           Hero(
             tag: 'logo',
             child: Image.asset(
-              'assets/logo1.png',
+              'assets/icon_flutter.png',
               height: 175,
             ),
           ),
