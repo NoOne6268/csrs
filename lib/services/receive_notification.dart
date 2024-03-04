@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,22 +10,6 @@ import 'package:csrs/services/location.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
-// class NotificationServices {
-//   FirebaseMessaging messaging = FirebaseMessaging
-//       .instance; // FirebaseMessaging class from firebase_messaging package
-//   Location location = Location(); // Location class from location.dart
-//
-//   // redirecting to google maps when notification clicked
-//   void handleMessage(BuildContext context, RemoteMessage message) {
-//     if (message.data['type'] == 'msj') {
-//       // Navigator.push(context , MaterialPageRoute(builder: (context) => const Home()));
-//       var langitude = double.parse(message.data['langitude']);
-//       var longitude = double.parse(message.data['longitude']);
-//       location.redirect(langitude, longitude);
-//       print('redirecting to location');
-//     }
-//   }
-// }
 class NotificationServices {
   // const NotificationServices._();
    Location location = Location();
@@ -125,27 +110,7 @@ class NotificationServices {
 
      });
    }
-   // void firebaseInit(BuildContext context){
-   //   FirebaseMessaging.onMessage.listen((event) {
-   //     print(
-   //          'notification received and clicked  ${event.notification}');
-   //      print('event is ${event.data}');
-   //
-   //     if (kDebugMode) {
-   //       print(event.notification!.body);
-   //       print(event.notification!.title);
-   //       print(event.data.toString());
-   //       print(event.data['type']);
-   //     }
-   //     if(Platform.isAndroid){
-   //       initLocalNotifications(context , event);
-   //       showNotifications(event);
-   //     }else if(Platform.isIOS){
-   //       showNotifications(event);
-   //     }
-   //
-   //   });
-   // }
+
 
   Future<void> showNotifications (RemoteMessage message)async {
 
@@ -183,8 +148,20 @@ class NotificationServices {
     messaging.onTokenRefresh.listen((event) {
       event.toString();
       if (kDebugMode) {
-        print('token refreshed');
+        print('token refreshed, new token is : $event');
+
       }
+      var response = http.post(
+        Uri.parse('https://csrs-server-3928af365723.herokuapp.com/update/token',
+        ),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'email' : 'harsagra3478@gmail.com',
+          'token' : event
+        }),
+      )
     });
   }
 

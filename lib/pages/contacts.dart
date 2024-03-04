@@ -64,6 +64,7 @@ class _ContactScreenState extends State<ContactScreen> {
                       name: contacts[index].contactName!,
                       imageUri: contacts[index].contactImageUrl ?? '',
                       phoneNo: contacts[index].contactPhone!,
+                      isDelete : true,
                       onPress: () async {
                         CoolAlert.show(
                           context: context,
@@ -141,14 +142,14 @@ class _ContactScreenState extends State<ContactScreen> {
                 myContact.contactName!,
                 myContact.contactPhone);
             print('response is : ${response['message']}');
-            kshowDialogue(
-                context,
-                response['status'].toString()! == 'true' ? 'success' : 'failed',
-                response['message']!);
+
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.success,
+              title: response['status'].toString()! == 'true' ? 'success' : 'failed',
+              text: response['message']!,
+            );
           }
-          // setState(() {
-          //   contacts.add(contact);
-          // });
         },
         child: const Icon(
           Icons.add,

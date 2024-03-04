@@ -1,10 +1,14 @@
 import 'package:cool_alert/cool_alert.dart';
+import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/services/local_notification_service.dart';
 import 'package:csrs/services/receive_notification.dart';
 import 'package:csrs/services/send_notification.dart';
+import 'package:csrs/services/sms_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
+
+import '../models/contact.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -15,15 +19,28 @@ class SosScreen extends StatefulWidget {
 
 class _SosScreenState extends State<SosScreen> {
   late StatelessWidget emergencyList;
-
+  List<MyContact> contacts = [];
+  bool isLoading = true;
+  void getContact() async {
+    var response = await ContactServices.getContacts('harsagra3478@gmail.com');
+    setState(() {
+      var responseData = response['data'];
+      contacts =
+          createContactsFromData(responseData.cast<Map<String, dynamic>>());
+      isLoading = false;
+    });
+    print('response is : ${response['data']}');
+  }
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
     super.initState();
+    getContact();
     LocalNotificationService.showLocalNotification(
         'SOS is ON!!', 'Help is on the way.');
     SendNotificationServices.sendNotificationToContacts(
         'title', 'body', true, 'harsagra3478@gmail.com');
+    SMSService.sendSMSToContacts('harsagra3478@gmail.com', 'message');
   }
 
   @override
@@ -110,16 +127,30 @@ class _SosScreenState extends State<SosScreen> {
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
+                      child: isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                          : contacts.isNotEmpty
+                          ? ListView.builder(
                         scrollDirection: Axis.vertical,
-                        itemCount: 5,
+                        itemCount: contacts.length,
                         itemBuilder: (BuildContext context, int index) {
                           return kContactTile(
-                              name: 'Name',
-                              imageUri: null,
-                              phoneNo: '1234567890',
-                              onPress: () {});
+                            name: contacts[index].contactName!,
+                            imageUri: contacts[index].contactImageUrl ?? '',
+                            phoneNo: contacts[index].contactPhone!,
+                            isDelete: false,
+                            onPress: ()  {
+                            },
+                          );
                         },
+                      )
+                          : const Center(
+                        child: Text(
+                          'No contacts added yet',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],

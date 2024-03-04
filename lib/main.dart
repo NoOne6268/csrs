@@ -151,6 +151,7 @@ void main() async {
    // _handleMessage(context);
   LocalNotificationService.setup();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  NotificationServices().isTokenRefreshed();
   runApp(const MyApp());
 }
 
