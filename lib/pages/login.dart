@@ -1,7 +1,10 @@
+import 'package:csrs/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
+
+import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
   bool obscureText = true;
   bool isPhone = false;
   // AuthService authService = AuthService();
@@ -27,167 +31,167 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: const Color(0xFF90BDDB),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: Colors.white,
-            size: 35,
+        resizeToAvoidBottomInset: false,
+        backgroundColor: const Color(0xFF90BDDB),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 35,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          onPressed: () => Navigator.of(context).pop(),
         ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(
-            height: 175,
-            child: Center(
-                child: Text(
-              'Welcome Back!',
-              style: TextStyle(
-                fontSize: 40.0,
-                fontWeight: FontWeight.w700,
-              ),
-            )),
-          ),
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24)),
-                color: Colors.white,
-              ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    kAuthFormField(
-                        emailController,
-                        isPhone ? 'Phone No' : 'Institute Email',
-                        'email can\'t be empty',
-                        key: const ValueKey('email'),
-                        onLogin: true),
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30.0,
-                        vertical: 4.0,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(
+              height: 175,
+              child: Center(
+                  child: Text(
+                'Welcome Back!',
+                style: TextStyle(
+                  fontSize: 40.0,
+                  fontWeight: FontWeight.w700,
+                ),
+              )),
+            ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24)),
+                  color: Colors.white,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(
+                        height: 20,
                       ),
-                      child: kAuthOtpButton(
-                        context,
-                        textColor: Colors.black,
-                        bgColor: const Color(0xFF90BDDB),
-                        text: 'Send OTP',
-                        onPress: () async {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Processing Data'),
-                              ),
-                            );
-                            
-                            if (isPhone) {
-                              var response = await nodeApis.sendOtp(
-                                  'login/phone', emailController.text, false);
-                              print('response is $response');
+                      kAuthFormField(
+                          emailController,
+                          isPhone ? 'Phone No' : 'Institute Email',
+                          'email can\'t be empty',
+                          key: const ValueKey('email'),
+                          onLogin: true),
+                      const SizedBox(
+                        height: 25.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30.0,
+                          vertical: 4.0,
+                        ),
+                        child: kAuthOtpButton(
+                          context,
+                          textColor: Colors.black,
+                          bgColor: const Color(0xFF90BDDB),
+                          text: 'Send OTP',
+                          onPress: () async {
+                            if (_formKey.currentState!.validate()) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Sending otp')));
-                              if (response['success'] == true) {
-                                context.goNamed('verifyotp', queryParameters: {
-                                  'loginOrRegister': 'login',
-                                  'nextRoute': 'home',
-                                  'isEmail': 'false',
-                                  'phone': emailController.text,
-                                });
-                              }
-                            } else {
-                              var response = await nodeApis.sendOtp(
-                                  'login/email', '${emailController.text}@kgpian.iitkgp.ac.in', true);
-                              print('response is $response');
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Sending otp')));
-                              if (response['success'] == true) {
-                                context.goNamed('verifyotp', queryParameters: {
-                                  'loginOrRegister': 'login',
-                                  'nextRoute': 'home',
-                                  'isEmail': 'true',
-                                  'email': '${emailController.text}@kgpian.iitkgp.ac.in',
-                                },);
+                                const SnackBar(
+                                  content: Text('Processing Data'),
+                                ),
+                              );
+      
+                              if (isPhone) {
+                                var response = await nodeApis.sendOtp(
+                                    'login/phone', emailController.text, false);
+                                print('response is $response');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Sending otp')));
+                                if (response['success'] == true) {
+                                  context.goNamed('verifyotp', queryParameters: {
+                                    'loginOrRegister': 'login',
+                                    'nextRoute': 'home',
+                                    'isEmail': 'false',
+                                    'phone': emailController.text,
+                                  });
+                                }
+                              } else {
+                                var response = await nodeApis.sendOtp(
+                                    'login/email', '${emailController.text}@kgpian.iitkgp.ac.in', true);
+                                print('response is $response');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Sending otp')));
+                                if (response['success'] == true) {
+                                  context.goNamed('verifyotp', queryParameters: {
+                                    'loginOrRegister': 'login',
+                                    'nextRoute': 'home',
+                                    'isEmail': 'true',
+                                    'email': '${emailController.text}@kgpian.iitkgp.ac.in',
+                                  },);
+                                }
                               }
                             }
-                          }
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isPhone = !isPhone;
+                          });
                         },
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20.0,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isPhone = !isPhone;
-                        });
-                      },
-                      child: Center(
-                        child: Text(
-                          isPhone
-                              ? 'Login Through Insti Email'
-                              : 'Login Through Phone Number',
-                          style: const TextStyle(
-                            fontSize: 25,
-                            shadows: [
-                              Shadow(color: Colors.black, offset: Offset(0, -5))
-                            ],
-                            color: Colors.transparent,
-                            decoration: TextDecoration.underline,
+                        child: Center(
+                          child: Text(
+                            isPhone
+                                ? 'Login Through Insti Email'
+                                : 'Login Through Phone Number',
+                            style: const TextStyle(
+                              fontSize: 25,
+                              shadows: [
+                                Shadow(color: Colors.black, offset: Offset(0, -5))
+                              ],
+                              color: Colors.transparent,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20.0,
-                    ),
-                    const HorizontalOrLine(
-                      label: "OR",
-                      height: 10.0,
-                      color: Colors.black,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        context.push('/signup/email');
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Signup Instead',
-                          style: TextStyle(
-                            fontSize: 25,
-                            shadows: [
-                              Shadow(color: Colors.black, offset: Offset(0, -5))
-                            ],
-                            color: Colors.transparent,
-                            decoration: TextDecoration.underline,
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      const HorizontalOrLine(
+                        label: "OR",
+                        height: 10.0,
+                        color: Colors.black,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/signup/email');
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Signup Instead',
+                            style: TextStyle(
+                              fontSize: 25,
+                              shadows: [
+                                Shadow(color: Colors.black, offset: Offset(0, -5))
+                              ],
+                              color: Colors.transparent,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
-      ),
+            )
+          ],
+        ),
     );
   }
 }
