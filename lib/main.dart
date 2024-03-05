@@ -1,15 +1,14 @@
-import 'dart:convert';
-
 import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
+import 'package:csrs/pages/add_image.dart';
 import 'package:csrs/pages/edit_profile.dart';
-import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/firebase_options.dart';
 import 'package:csrs/pages/welcome.dart';
 import 'package:csrs/services/local_notification_service.dart';
 import 'package:csrs/services/receive_notification.dart';
+import 'package:csrs/utils/user.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +35,7 @@ final GoRouter _router = GoRouter(
           path: 'signup/email',
           name: 'signup/email',
           builder: (BuildContext context, GoRouterState state) {
-            return SignupScreen();
+            return const SignupScreen();
           },
         ),
         GoRoute(
@@ -74,7 +73,7 @@ final GoRouter _router = GoRouter(
           path: 'login',
           name: '/login',
           builder: (BuildContext context, GoRouterState state) {
-            return const LoginScreen();
+            return LoginScreen();
           },
         ),
         GoRoute(
@@ -95,12 +94,13 @@ final GoRouter _router = GoRouter(
           path: 'profile',
           name: 'profile',
           builder: (BuildContext context, GoRouterState state) {
-            return  ProfileImage(
-              // email : state.uri.queryParameters['email']!,
-              // rollNo : state.uri.queryParameters['rollNo']!,
+            return const ProfileImage(
+              email: 'email',
+              rollNo: 'rollNo',
             );
           },
         ),
+
         GoRoute(
           path: 'profile/edit',
           name: 'profile/edit',
@@ -140,7 +140,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('context is $backgroundContext');
   NotificationServices().setUpInteractMessage(backgroundContext!);
   // _handleMessage(navigatorKey.currentContext!);
-
 }
 
 // main
@@ -149,7 +148,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   // _handleMessage(context);
+  // _handleMessage(context);
   LocalNotificationService.setup();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   NotificationServices().isTokenRefreshed();
@@ -230,11 +229,10 @@ Future<void> initPlatform() async {
   // print('something is happening');
 }
 
-void _handleMessage(BuildContext context){
+void _handleMessage(BuildContext context) {
   NotificationServices _notificationServices = NotificationServices();
   _notificationServices.requestNotificationPermission();
   _notificationServices.firebaseInit(context);
   _notificationServices.getToken();
   _notificationServices.setUpInteractMessage(context);
-
 }

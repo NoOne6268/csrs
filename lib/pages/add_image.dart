@@ -9,8 +9,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileImage extends StatefulWidget {
-  const ProfileImage(
-      {super.key, required String rollNo, required String email});
+
+  const ProfileImage({
+    super.key,
+    required String rollNo,
+    required String email,
+  });
   // final String initials;
   @override
   State<ProfileImage> createState() => _ProfileImageState();
@@ -45,6 +49,8 @@ class _ProfileImageState extends State<ProfileImage> {
   void getFilePath() async {
     prefs = await SharedPreferences.getInstance();
     directory = await getApplicationDocumentsDirectory();
+    setState(() {});
+
   }
 
   @override
@@ -75,123 +81,144 @@ class _ProfileImageState extends State<ProfileImage> {
           backgroundColor: const Color(0xFF506D85),
         ),
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 100,
-                    backgroundImage: const AssetImage('assets/static_profile.png'),
-                    foregroundImage: (prefs.getString('profile_photo') == null ? null : FileImage(File(prefs.getString('profile_photo')!))),
-                    // (_image == null
-                    //     ? const AssetImage('assets/static_profile.png')
-                    //     : FileImage(_image!)),
-                  ),
-                  Positioned(
-                    bottom: 1,
-                    right: 1,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          elevation: 6.0,
-                          padding: const EdgeInsets.all(10.0),
-                          shape: const CircleBorder(
-                            side: BorderSide.none,
-                          )),
-                      onPressed: () async {
-                        final file = await ImagePicker()
-                            .pickImage(source: ImageSource.camera);
-                        final croppedFile = await ImageCropper().cropImage(
-                          sourcePath: file!.path,
-                          uiSettings: [
-                            AndroidUiSettings(
-                              lockAspectRatio: true,
-                              initAspectRatio: CropAspectRatioPreset.square,
-                              hideBottomControls: true,
-                            ),
-                            IOSUiSettings(
-                              aspectRatioLockEnabled: true,
-                              aspectRatioPickerButtonHidden: true,
-                            )
-                          ],
-                        );
 
-                        saveImage(croppedFile!);
-                      },
-                      child: const Icon(
-                        Icons.edit,
-                        size: 30,
-                        color: Colors.black,
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 100,
+                        backgroundImage:
+                            const AssetImage('assets/static_profile.png'),
+                        foregroundImage:
+                            (prefs.getString('profile_photo') == null
+                                ? null
+                                : FileImage(
+                                    File(prefs.getString('profile_photo')!))),
+                        // (_image == null
+                        //     ? const AssetImage('assets/static_profile.png')
+                        //     : FileImage(_image!)),
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton(
-              onPressed: () async {
-                final file =
-                    await ImagePicker().pickImage(source: ImageSource.gallery);
-                final croppedFile = await ImageCropper().cropImage(
-                  sourcePath: file!.path,
-                  uiSettings: [
-                    AndroidUiSettings(
-                      lockAspectRatio: true,
-                      initAspectRatio: CropAspectRatioPreset.square,
-                      hideBottomControls: true,
-                    ),
-                    IOSUiSettings(
-                      aspectRatioLockEnabled: true,
-                      aspectRatioPickerButtonHidden: true,
-                    )
-                  ],
-                );
+                      Positioned(
+                        bottom: 1,
+                        right: 1,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              elevation: 6.0,
+                              padding: const EdgeInsets.all(10.0),
+                              shape: const CircleBorder(
+                                side: BorderSide.none,
+                              )),
+                          onPressed: () async {
+                            final file = await ImagePicker()
+                                .pickImage(source: ImageSource.camera);
+                            final croppedFile =
+                                await ImageCropper().cropImage(
+                              sourcePath: file!.path,
+                              uiSettings: [
+                                AndroidUiSettings(
+                                  lockAspectRatio: true,
+                                  initAspectRatio:
+                                      CropAspectRatioPreset.square,
+                                  hideBottomControls: true,
+                                ),
+                                IOSUiSettings(
+                                  aspectRatioLockEnabled: true,
+                                  aspectRatioPickerButtonHidden: true,
+                                )
+                              ],
+                            );
 
-                saveImage(croppedFile!);
-              },
-              child: const Text(
-                "Upload from Gallery",
-                style: TextStyle(
-                  fontSize: 23,
+                            saveImage(croppedFile!);
+                          },
+                          child: const Icon(
+                            Icons.edit,
+                            size: 30,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final file = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
+                    final croppedFile = await ImageCropper().cropImage(
+                      sourcePath: file!.path,
+                      uiSettings: [
+                        AndroidUiSettings(
+                          lockAspectRatio: true,
+                          initAspectRatio: CropAspectRatioPreset.square,
+                          hideBottomControls: true,
+                        ),
+                        IOSUiSettings(
+                          aspectRatioLockEnabled: true,
+                          aspectRatioPickerButtonHidden: true,
+                        )
+                      ],
+                    );
+
+                    saveImage(croppedFile!);
+                  },
+                  child: const Text(
+                    "Upload from Gallery",
+                    style: TextStyle(
+                      fontSize: 23,
+                      color: const Color(0xFF506D85),
+                    ),
+                  ),
+                ),
+                kAuthFormField(
+                  nameController,
+                  'Name',
+                  'Name',
+                  key: const ValueKey('name'),
+                  onLogin: true,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF506D85),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50),),
+                    padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 4.0),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      if (_image == null) {
+                        setState(() {});
+                      }
+                      // nodeApis.updateProfile(_image!, "email");
+                      // Navigator.pushNamed(context, '/home');
+                    }
+                    // Navigator.pushNamed(context, '/home');
+                  },
+                  child: const Text('Save', style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                  ),),
+                )
+              ],
             ),
-            kAuthFormField(
-              nameController,
-              'Name',
-              'Name',
-              key: const ValueKey('name'),
-              onLogin: true,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextButton(
-              // style: ElevatedButton.styleFrom(
-              //   primary: Colors.lightGreenAccent,
-              //
-              // ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  if (_image == null) {
-                    setState(() {});
-                  }
-                  // nodeApis.updateProfile(_image!, "email");
-                  // Navigator.pushNamed(context, '/home');
-                }
-                // Navigator.pushNamed(context, '/home');
-              },
-              child: const Text('Save'),
-            )
-          ],
+          ),
+
         ),
       ),
     );
