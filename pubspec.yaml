@@ -68,6 +68,9 @@ dependencies:
   flutter_riverpod: ^2.4.10
   riverpod_annotation: ^2.3.4
   path: ^1.9.0
+  cool_alert: ^2.0.1
+  pinput: ^4.0.0
+  get: ^4.6.6
 dev_dependencies:
   flutter_test:
     sdk: flutter

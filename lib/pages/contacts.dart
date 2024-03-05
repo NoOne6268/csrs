@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/utils/custom_dialogue_boxes.dart';
 import 'package:flutter/material.dart';
@@ -50,28 +51,56 @@ class _ContactScreenState extends State<ContactScreen> {
         titleText: 'Your Contacts',
       ),
       // rendering the list of contacts using listview builder
-      body: isLoading ?
-      const Center(
-        child: CircularProgressIndicator(),
-      )
-          :
-      ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: contacts.length,
-        itemBuilder: (BuildContext context, int index) {
-          return kContactTile(
-              name: contacts[index].contactName!,
-              imageUri: contacts[index].contactImageUrl ?? '',
-              phoneNo: contacts[index].contactPhone!,
-              onPress : ()
-          async {
-           await ContactServices.deleteContact('harsagra3478@gmail.com', contacts[index].contactPhone!);
-            setState(() {
-              contacts.removeAt(index);
-            });
-          },);
-        },
-      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : contacts.isNotEmpty
+              ? ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: contacts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return kContactTile(
+                      name: contacts[index].contactName!,
+                      imageUri: contacts[index].contactImageUrl ?? '',
+                      phoneNo: contacts[index].contactPhone!,
+                      isDelete : true,
+                      onPress: () async {
+                        CoolAlert.show(
+                          context: context,
+                          type: CoolAlertType.confirm,
+                          title: ' Delete ${contacts[index].contactName} ?',
+                          text: 'Are you sure you want to delete this contact?',
+                          confirmBtnText: 'Yes',
+                          cancelBtnText: 'No',
+                          onConfirmBtnTap: () async {
+                            await ContactServices.deleteContact(
+                                'harsagra3478@gmail.com',
+                                contacts[index].contactPhone!);
+                            setState(() {
+                              contacts.removeAt(index);
+                            });
+                            CoolAlert.show(
+                                context: context,
+                                type: CoolAlertType.success,
+                                title: 'Contact Deleted',
+                                text:
+                                    'The contact has been deleted successfully');
+                          },
+                          onCancelBtnTap: () {
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
+              : const Center(
+                  child: Text(
+                    'No contacts added yet',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF506D85),
@@ -84,27 +113,43 @@ class _ContactScreenState extends State<ContactScreen> {
           if (contacts
               .map((item) => item.contactPhone![0])
               .contains(contact!.phoneNumbers![0])) {
-            kshowDialogue(context, 'contact is already added',
-                'The contact you are trying to add is already present in the list. Please try adding another contact.');
-          }else if(contacts.length >= 5){
-            kshowDialogue(context, 'contact limit reached',
-                'You can only add 5 contacts. Please delete some contacts to add more.');
-          }
-          else {
+            // kshowDialogue(context, 'contact is already added',
+            //     'The contact you are trying to add is already present in the list. Please try adding another contact.');
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.error,
+              title: 'Contact already added',
+              text:
+                  'The contact you are trying to add is already present in the list. Please try adding another contact.',
+            );
+          } else if (contacts.length >= 5) {
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.error,
+              title: 'Contact limit reached',
+              text:
+                  'You can only add upto 5 contacts. Please delete some contacts to add more.',
+            );
+
+            // kshowDialogue(context, 'contact limit reached',
+            //     'You can only add 5 contacts. Please delete some contacts to add more.');
+          } else {
             setState(() {
               contacts.add(myContact);
             });
             var response = await ContactServices.saveContact(
-                'harsagra3478@gmail.com', myContact.contactName!,
+                'harsagra3478@gmail.com',
+                myContact.contactName!,
                 myContact.contactPhone);
             print('response is : ${response['message']}');
-            kshowDialogue(context,
-                response['status'].toString()! == 'true' ? 'success' : 'failed',
-                response['message']!);
+
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.success,
+              title: response['status'].toString()! == 'true' ? 'success' : 'failed',
+              text: response['message']!,
+            );
           }
-          // setState(() {
-          //   contacts.add(contact);
-          // });
         },
         child: const Icon(
           Icons.add,
@@ -115,5 +160,3 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 }
-
-

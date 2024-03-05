@@ -1,10 +1,16 @@
 import 'dart:async';
+import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/send_notification.dart';
+import 'package:csrs/services/sms_service.dart';
 import 'package:csrs/utils/side_drawer.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart';
+import 'package:popover/popover.dart';
 import '../utils/custom_widgets.dart';
 
 Future<void> checkCurrentUser() async {
@@ -80,33 +86,27 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: GestureDetector(
-                // onTap: () {
-                //   showPopover(
-                //     context: context,
-                //     bodyBuilder: (context) => ListView(
-                //       children: [
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //         ListTile(
-                //           title: Text('Hello'),
-                //         ),
-                //       ],
-                //     ),
-                //     onPop: () => print('Popover was popped!'),
-                //     direction: PopoverDirection.right,
-                //     width: 200,
-                //     height: 400,
-                //     arrowHeight: 15,
-                //     arrowWidth: 30,
-                //
-                //   );
-                // },
+                onTap: () {
+                  showPopover(
+                    context: context,
+                    backgroundColor: Colors.black,
+                    bodyBuilder: (context) => ListView(
+                      children: [
+                            Hero(tag: 'ajdf', child: Text('sjfjslfdjsljfdklj')),
+                      ],
+                    ),
+
+                    onPop: () => print('Popover was popped!'),
+                    direction: PopoverDirection.right,
+                    width: 200,
+                    height: 400,
+                    arrowHeight: 15,
+                    arrowWidth: 30,
+
+                  );
+                },
                 child: const Icon(
-                  Icons.more_vert_outlined,
+                  Icons.notifications,
                   color: Colors.white,
                   size: 35,
                 ),
@@ -134,7 +134,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 context.push('/cnt');
               },
               icon: SvgPicture.asset('assets/sos_main.svg'),
-            )
+            ),
+            const SizedBox(
+              height: 30.0,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // LocalNotificationService.showLocalNotification(
+                //     'SOS is ON!!', 'Help is on the way.');
+                // SendNotificationServices.sendNotificationToContacts(
+                //     'title', 'body', true, 'harsagra3478@gmail.com');
+                SMSService.sendSMSToContacts(
+                    'harsagra3478@gmail.com', 'message');
+              },
+              child: const Text('testing button'),
+            ),
           ],
         ),
       ),
@@ -170,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'assets/add_contact.png',
                 'Profile',
                 onEvent: () {
-                  context.push('/profile');
+                  context.push('/profile/edit');
                 },
               ),
             ],

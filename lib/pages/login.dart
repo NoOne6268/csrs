@@ -1,4 +1,4 @@
-import 'package:csrs/utils/user.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
@@ -88,74 +88,120 @@ class _LoginScreenState extends State<LoginScreen> {
                           horizontal: 30.0,
                           vertical: 4.0,
                         ),
-                        child: kAuthOtpButton(
-                          context,
-                          textColor: Colors.black,
-                          bgColor: const Color(0xFF90BDDB),
-                          text: 'Send OTP',
-                          onPress: () async {
-                            if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Processing Data'),
+                      child: kAuthOtpButton(
+                        context,
+                        textColor: Colors.black,
+                        bgColor: const Color(0xFF90BDDB),
+                        text: 'Send OTP',
+                        onPress: () async {
+                          if (_formKey.currentState!.validate()) {
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //     const SnackBar(
+                          //       content: Text('Processing Data'),
+                          //     ),
+                          //   );
+                            final snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: AwesomeSnackbarContent(
+                                    title: 'Validating data !! ',
+                                    message: '',
+                                    contentType: ContentType.help,
+                                  ),
+                                ),
+                              ),
+                            );
+
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(snackBar);
+
+                            if (isPhone) {
+                              var response = await nodeApis.sendOtp(
+                                  'login/phone', emailController.text, false);
+                              print('response is $response');
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //     const SnackBar(content: Text('Sending otp')));
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.values[1],
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: 'Sending otp!!',
+                                  message:
+                                  '',
+                                  contentType: ContentType.help,
                                 ),
                               );
-      
-                              if (isPhone) {
-                                var response = await nodeApis.sendOtp(
-                                    'login/phone', emailController.text, false);
-                                print('response is $response');
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Sending otp')));
-                                if (response['success'] == true) {
-                                  context.goNamed('verifyotp', queryParameters: {
-                                    'loginOrRegister': 'login',
-                                    'nextRoute': 'home',
-                                    'isEmail': 'false',
-                                    'phone': emailController.text,
-                                  });
-                                }
-                              } else {
-                                var response = await nodeApis.sendOtp(
-                                    'login/email', '${emailController.text}@kgpian.iitkgp.ac.in', true);
-                                print('response is $response');
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Sending otp')));
-                                if (response['success'] == true) {
-                                  context.goNamed('verifyotp', queryParameters: {
-                                    'loginOrRegister': 'login',
-                                    'nextRoute': 'home',
-                                    'isEmail': 'true',
-                                    'email': '${emailController.text}@kgpian.iitkgp.ac.in',
-                                  },);
-                                }
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
+                              if (response['success'] == true) {
+                                context.goNamed('verifyotp', queryParameters: {
+                                  'loginOrRegister': 'login',
+                                  'nextRoute': 'home',
+                                  'isEmail': 'false',
+                                  'phone': emailController.text,
+                                });
                               }
                             }
-                          },
-                        ),
+                            else {
+                              var response = await nodeApis.sendOtp(
+                                  'login/email', '${emailController.text}@kgpian.iitkgp.ac.in', true);
+                              print('response is $response');
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.values[1],
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: response['success'].toString()=='false' ? 'Failed' : 'True',
+                                  message: response['message'],
+                                  contentType: response['success'].toString()=='false' ? ContentType.failure : ContentType.success,
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
+                              if (response['success'] == true) {
+                                context.goNamed('verifyotp', queryParameters: {
+                                  'loginOrRegister': 'login',
+                                  'nextRoute': 'home',
+                                  'isEmail': 'true',
+                                  'email': '${emailController.text}@kgpian.iitkgp.ac.in',
+                                },);
+                              }
+                            }
+                          }
+    },
                       ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isPhone = !isPhone;
-                          });
-                        },
-                        child: Center(
-                          child: Text(
-                            isPhone
-                                ? 'Login Through Insti Email'
-                                : 'Login Through Phone Number',
-                            style: const TextStyle(
-                              fontSize: 25,
-                              shadows: [
-                                Shadow(color: Colors.black, offset: Offset(0, -5))
-                              ],
-                              color: Colors.transparent,
-                              decoration: TextDecoration.underline,
-                            ),
+                    ),
+                    const SizedBox(
+                      height: 20.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isPhone = !isPhone;
+                        });
+                      },
+                      child: Center(
+                        child: Text(
+                          isPhone
+                              ? 'Login Through Insti Email'
+                              : 'Login Through Phone Number',
+                          style: const TextStyle(
+                            fontSize: 25,
+                            shadows: [
+                              Shadow(color: Colors.black, offset: Offset(0, -5))
+                            ],
+                            color: Colors.transparent,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),

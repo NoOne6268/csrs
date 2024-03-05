@@ -1,7 +1,14 @@
+import 'package:cool_alert/cool_alert.dart';
+import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/receive_notification.dart';
+import 'package:csrs/services/send_notification.dart';
+import 'package:csrs/services/sms_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
+
+import '../models/contact.dart';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -12,67 +19,38 @@ class SosScreen extends StatefulWidget {
 
 class _SosScreenState extends State<SosScreen> {
   late StatelessWidget emergencyList;
-
-  _confirmDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Center(
-            child: Text(
-              'Confirm',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,),
-            )),
-        content: const Text('Are you sure you are safe?', style: TextStyle(
-          fontSize: 20,
-        ),),
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0x99EB5151),
-            ),
-            child: const Text(
-              'No',
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFEB5151),
-            ),
-            child: const Text(
-              'Yes',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () {
-              // TODO: Add safe now api function
-              context.goNamed('/home');
-            },
-          ),
-        ],
-      ),
-    );
+  List<MyContact> contacts = [];
+  bool isLoading = true;
+  void getContact() async {
+    var response = await ContactServices.getContacts('harsagra3478@gmail.com');
+    setState(() {
+      var responseData = response['data'];
+      contacts =
+          createContactsFromData(responseData.cast<Map<String, dynamic>>());
+      isLoading = false;
+    });
+    print('response is : ${response['data']}');
   }
-
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
     super.initState();
-    LocalNotificationService.showLocalNotification('SOS is ON!!', 'Help is on the way.');
+    getContact();
+    LocalNotificationService.showLocalNotification(
+        'SOS is ON!!', 'Help is on the way.');
+    SendNotificationServices.sendNotificationToContacts(
+        'title', 'body', true, 'harsagra3478@gmail.com');
+    SMSService.sendSMSToContacts('harsagra3478@gmail.com', 'message');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: kBackAppbar(context, color: const Color(0xFFEB5151),),
+      appBar: kBackAppbar(
+        context,
+        color: const Color(0xFFEB5151),
+      ),
       body: Center(
         child: Column(
           children: [
@@ -83,7 +61,9 @@ class _SosScreenState extends State<SosScreen> {
                   ksosText(
                     showText: 'Emergency signal Received.',
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   ksosText(
                     showText: 'Help is on the way.',
                   ),
@@ -91,16 +71,30 @@ class _SosScreenState extends State<SosScreen> {
                     'assets/help.png',
                     height: 150,
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 6.0,
                       backgroundColor: Color(0xFF7ACAA6),
                     ),
                     onPressed: () {
-                      _confirmDialog(context);
-                    },
+                      CoolAlert.show(
+                        context: context,
+                        type: CoolAlertType.confirm,
+                        title: 'Are you sure you are safe?',
+                        confirmBtnText: 'Yup!!',
+                        cancelBtnText: 'Miss Tap',
+                        onConfirmBtnTap: () {
+                          context.push('/home');
+                        },
+                        onCancelBtnTap: () {
+                          Navigator.of(context).pop();
+                        },
+                      );
 
+                    },
                     child: const Text(
                       'Safe now',
                       style: TextStyle(
@@ -133,13 +127,30 @@ class _SosScreenState extends State<SosScreen> {
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
+                      child: isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                          : contacts.isNotEmpty
+                          ? ListView.builder(
                         scrollDirection: Axis.vertical,
-                        itemCount: 5,
+                        itemCount: contacts.length,
                         itemBuilder: (BuildContext context, int index) {
                           return kContactTile(
-                              name: 'Name', imageUri: null, phoneNo: '1234567890' , onPress: (){});
+                            name: contacts[index].contactName!,
+                            imageUri: contacts[index].contactImageUrl ?? '',
+                            phoneNo: contacts[index].contactPhone!,
+                            isDelete: false,
+                            onPress: ()  {
+                            },
+                          );
                         },
+                      )
+                          : const Center(
+                        child: Text(
+                          'No contacts added yet',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -151,6 +162,4 @@ class _SosScreenState extends State<SosScreen> {
       ),
     );
   }
-
-
 }

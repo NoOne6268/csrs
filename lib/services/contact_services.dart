@@ -6,7 +6,7 @@ class ContactServices {
   const ContactServices._();
 
   static const String baseUrl =
-      'https://csrs-server-3928af365723.herokuapp.com';
+      'https://csrsserver.onrender.com';
 
   static Future<Map<String, dynamic>> saveContact(String email,
       String contactName, String contactPhone) async {

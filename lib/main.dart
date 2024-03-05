@@ -1,9 +1,12 @@
 import 'package:csrs/pages/contacts.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/add_image.dart';
+import 'package:csrs/pages/edit_profile.dart';
+import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/firebase_options.dart';
+import 'package:csrs/pages/welcome.dart';
 import 'package:csrs/services/local_notification_service.dart';
 import 'package:csrs/services/receive_notification.dart';
 import 'package:csrs/utils/user.dart';
@@ -27,10 +30,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const ProfileImage(
-          email: 'email',
-          rollNo: 'rollNo',
-        );
+        return const WelcomeScreen();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -94,11 +94,15 @@ final GoRouter _router = GoRouter(
             }),
         GoRoute(
           path: 'profile',
-          name: '/profile',
+          name: 'profile',
           builder: (BuildContext context, GoRouterState state) {
-            return const ProfileImage(
-              email: 'email',
-              rollNo: 'rollNo',
+        GoRoute(
+          path: 'profile/edit',
+          name: 'profile/edit',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileScreen(
+              // email : 'email',
+              // rollNo : 'rollNo',
             );
           },
         ),
@@ -142,11 +146,8 @@ void main() async {
   // _handleMessage(context);
   LocalNotificationService.setup();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    ProviderScope(
-      child: const MyApp(),
-    ),
-  );
+  NotificationServices().isTokenRefreshed();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {

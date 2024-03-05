@@ -2,6 +2,7 @@ import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/utils/custom_dialogue_boxes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
 
@@ -244,7 +245,7 @@ class Step extends StatelessWidget {
 }
 
 Padding kContactTile(
-    {required String name, required String? imageUri, required String phoneNo , required void Function() ? onPress }) {
+    {required String name, required String? imageUri, required String phoneNo , required bool isDelete , required void Function() ? onPress }) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 10.0),
     child: Row(
@@ -267,7 +268,7 @@ Padding kContactTile(
             child: Text(
               name,
               style: const TextStyle(
-                fontSize: 25,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -282,11 +283,14 @@ Padding kContactTile(
             bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNo);
           },
         ),
-        IconButton(
-          onPressed: onPress,
-          icon: const Icon(
-            Icons.delete_outline_outlined,
-            size: 40,
+        Visibility(
+          visible: isDelete,
+          child: IconButton(
+            onPressed: onPress,
+            icon: const Icon(
+              Icons.delete_outline_outlined,
+              size: 40,
+            ),
           ),
         )
       ],
