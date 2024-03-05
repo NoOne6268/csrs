@@ -18,7 +18,7 @@ class NotificationServices {
   FlutterLocalNotificationsPlugin();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   void requestNotificationPermission() async {
-    NotificationSettings settings = await messaging.requestPermission(
+      NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       announcement: true,
       badge: true,
@@ -152,7 +152,7 @@ class NotificationServices {
 
       }
       var response = http.post(
-        Uri.parse('https://csrs-server-3928af365723.herokuapp.com/update/token',
+        Uri.parse('https://csrsserver.onrender.com/update/token',
         ),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -161,7 +161,7 @@ class NotificationServices {
           'email' : 'harsagra3478@gmail.com',
           'token' : event
         }),
-      )
+      );
     });
   }
 

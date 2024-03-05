@@ -8,7 +8,7 @@ class SendNotificationServices {
   const SendNotificationServices._();
 
   static Location location = Location();
-  static String baseUrl = 'https://csrs-server-3928af365723.herokuapp.com';
+  static String baseUrl = 'https://csrsserver.onrender.com';
 
   static void sendNotification(
       String token, String title, String body, bool isSafe) async {

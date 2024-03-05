@@ -87,6 +87,8 @@ Drawer kSideDrawer(BuildContext context) {
         ),
         ListTile(
           onTap: () {
+            //clear the cookies and go to login page
+
             context.go('/login');
           },
           title: const Text('Logout'),

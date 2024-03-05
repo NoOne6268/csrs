@@ -7,6 +7,7 @@ import 'package:csrs/pages/profile_image.dart';
 import 'package:csrs/pages/signup2.dart';
 import 'package:csrs/pages/sos.dart';
 import 'package:csrs/firebase_options.dart';
+import 'package:csrs/pages/welcome.dart';
 import 'package:csrs/services/local_notification_service.dart';
 import 'package:csrs/services/receive_notification.dart';
 import 'package:home_widget/home_widget.dart';
@@ -28,7 +29,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen();
+        return const WelcomeScreen();
       },
       routes: <RouteBase>[
         GoRoute(

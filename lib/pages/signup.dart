@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:csrs/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
@@ -20,7 +22,17 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController rollNoController = TextEditingController();
+  void CheckLogin()async{
+    if(await nodeApis.checkLogin()){
+      context.pushNamed('/home');
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    CheckLogin();
 
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,8 +111,22 @@ class _SignupScreenState extends State<SignupScreen> {
                             'email' : '${emailController.text}@kgpian.iitkgp.ac.in',
                           });
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(response['message'])));
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(content: Text(response['message'])));
+                        final snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: '',
+                            message:
+                            response['message'],
+                            contentType: ContentType.help,
+                          ),
+                        );
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar);
                       }
                     }),
                     const HorizontalOrLine(

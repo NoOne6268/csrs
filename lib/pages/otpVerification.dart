@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -95,8 +96,23 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   otpController.text, true)
                               .then((value) {
                             print('value is $value');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${value['message']}')));
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(content: Text('${value['message']}')));
+                            final snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                title: value['success'] == true ? 'Success' : 'Failure',
+                                message:
+                                value['message'],
+                                contentType: value['success'] == true ? ContentType.success : ContentType.failure,
+                              ),
+                            );
+
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(snackBar);
                             print('value of succes is , ${value['success']}');
                             if (value['success'] == true) {
                               context
