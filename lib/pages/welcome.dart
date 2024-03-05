@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:csrs/pages/signup.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../services/node_authorization.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -11,15 +14,27 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  NodeApis nodeApis = NodeApis();
+  void CheckLogin()async{
+
+    if(await nodeApis.checkLogin()){
+      context.pushNamed('/home');
+    }
+    else{
+      Timer(
+        const Duration(seconds: 2),
+            () {
+          Navigator.of(context).push(_createRoute());
+        },
+      );
+    }
+}
   @override
   void initState() {
     super.initState();
-    Timer(
-      const Duration(seconds: 2),
-      () {
-        Navigator.of(context).push(_createRoute());
-      },
-    );
+
+      CheckLogin();
+
   }
 
   Route _createRoute() {
