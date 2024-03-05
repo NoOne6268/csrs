@@ -249,6 +249,5 @@ class ListItems extends StatelessWidget {
         ],
       ),
     );
-    ;
   }
 }
