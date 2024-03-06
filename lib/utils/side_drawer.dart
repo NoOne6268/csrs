@@ -1,16 +1,12 @@
+import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:flutter_sms/flutter_sms.dart';
 
-
-
-Drawer kSideDrawer(BuildContext context) {
-  String? name = "Dummy Name";
-  String? rollNo = "20AS10223";
-  File? image;
-
+Drawer kSideDrawer(BuildContext context, String name, String rollNo,
+    String imageUrl, String email) {
   return Drawer(
     backgroundColor: const Color(0xFFBBE1FA),
     child: ListView(
@@ -30,21 +26,28 @@ Drawer kSideDrawer(BuildContext context) {
               CircleAvatar(
                 radius: 40,
                 backgroundImage: const AssetImage('assets/static_profile.png'),
-                foregroundImage: (image != null ? FileImage(image!) : null),
+                foregroundImage: (imageUrl != null || imageUrl != ''
+                    ? NetworkImage(imageUrl)
+                    : null),
               ),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
-                    Text(name, style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                    ),),
-                    Text(rollNo, style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                      ),
+                    ),
+                    Text(
+                      rollNo,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -52,48 +55,84 @@ Drawer kSideDrawer(BuildContext context) {
           ),
         ),
         ListTile(
-          title: Text('Profile'),
-          leading: Icon(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+          title: const Text(
+            'Profile',
+            style: TextStyle(fontSize: 30),
+          ),
+          leading:const Icon(
             Icons.person,
             color: Colors.black,
+            size: 30,
           ),
           onTap: () {
-            context.push('/profile');
+            context.pushNamed('profile/edit', queryParameters: {
+              'email': email,
+              'name': name,
+              'rollNo': rollNo,
+              'imageUrl': imageUrl
+            });
           },
         ),
         ListTile(
-          title: const Text('Contacts'),
-          leading: Icon(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+          title: const Text(
+            'Contacts',
+            style: TextStyle(fontSize: 30),
+          ),
+          leading:const Icon(
             Icons.contact_page,
+            size: 30,
             color: Colors.black,
           ),
           onTap: () {
-            context.push('/contact');
+            context.push('/contacts');
           },
         ),
-        ListTile(
-          title: Text('Settings'),
+        const ListTile(
+          contentPadding:
+              EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+          title: Text(
+            'Settings',
+            style: TextStyle(fontSize: 30),
+          ),
           leading: Icon(
             Icons.settings,
+            size: 30,
             color: Colors.black,
           ),
         ),
-        ListTile(
-          title: Text('Help'),
+        const ListTile(
+          contentPadding:
+               EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+          title: Text(
+            'Help',
+            style: TextStyle(fontSize: 30),
+          ),
           leading: Icon(
             Icons.help,
+            size: 30,
             color: Colors.black,
           ),
         ),
         ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
           onTap: () {
             //clear the cookies and go to login page
-
+            NodeApis nodeApis = NodeApis();
+            nodeApis.logout(context);
             context.go('/login');
           },
-          title: const Text('Logout'),
+          title: const Text(
+            'Logout',
+            style: TextStyle(fontSize: 30),
+          ),
           leading: const Icon(
             Icons.logout,
+            size: 30,
             color: Colors.black,
           ),
         )

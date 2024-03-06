@@ -91,12 +91,12 @@ final GoRouter _router = GoRouter(
               );
             }),
         GoRoute(
-          path: 'profile',
-          name: 'profile',
+          path: 'profile/create',
+          name: 'profile/create',
           builder: (BuildContext context, GoRouterState state) {
-            return const ProfileImage(
-              email: 'email',
-              rollNo: 'rollNo',
+            return  ProfileImage(
+              email: state.uri.queryParameters['email'],
+              rollNo: state.uri.queryParameters['rollNo'],
             );
           },
         ),
@@ -105,15 +105,17 @@ final GoRouter _router = GoRouter(
           path: 'profile/edit',
           name: 'profile/edit',
           builder: (BuildContext context, GoRouterState state) {
-            return const ProfileScreen(
-              // email : 'email',
-              // rollNo : 'rollNo',
+            return  EditProfile(
+              email : state.uri.queryParameters['email'],
+              name : state.uri.queryParameters['name'],
+              rollNo : state.uri.queryParameters['rollNo'],
+              imageUrl : state.uri.queryParameters['imageUrl'],
             );
           },
         ),
         GoRoute(
           path: 'contacts',
-          name: '/contacts',
+          name: 'contacts',
           builder: (BuildContext context, GoRouterState state) {
             return const ContactScreen();
           },

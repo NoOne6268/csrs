@@ -72,16 +72,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(
-                      height: 25,
+                      height: 30,
                     ),
                     kAuthFormField(
                         emailController,
-                        isPhone ? 'Phone No' : 'Institute Email',
+                        isPhone ? 'Phone No' : 'Insti mail',
                         'email can\'t be empty',
                         key: const ValueKey('email'),
                         onLogin: true),
                     const SizedBox(
-                      height: 25.0,
+                      height: 20.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   true);
                               print('response is $response');
                               final snackBar = SnackBar(
-                                elevation: 0,
+                                elevation: 10,
                                 behavior: SnackBarBehavior.values[1],
                                 backgroundColor: Colors.transparent,
                                 content: AwesomeSnackbarContent(

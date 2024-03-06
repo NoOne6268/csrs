@@ -145,6 +145,7 @@ Padding kAuthFormField(
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
     child: TextFormField(
       key: key,
+      keyboardType: hintText == 'Phone No' ? TextInputType.phone : TextInputType.text,
       validator: (value) {
         if (value!.isEmpty) {
           return isEmpty;
@@ -160,6 +161,7 @@ Padding kAuthFormField(
           ),
         ],
       ),
+
       controller: controller,
       decoration: InputDecoration(
           filled: true,
@@ -169,6 +171,7 @@ Padding kAuthFormField(
           hintStyle: const TextStyle(
             fontSize: 25,
           ),
+
           suffixText: hintText == 'Insti mail' ? '@kgpian.iitkgp.ac.in' : '',
           suffixStyle: const TextStyle(
             fontWeight: FontWeight.w500,

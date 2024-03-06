@@ -1,36 +1,25 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
 import 'dart:convert';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:csrs/services/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NodeApis {
-  var currentUser = '';
-  var currentEmail = '';
   Location location = Location();
   final String baseUrl = 'https://csrsserver.onrender.com';
-
-  Future<String?> getUserID() async {
-    String? userID;
-    try {
-      OneSignal.shared.getDeviceState().then((value) {
-        print(
-            'user id is : ${value!.userId} , and device state is ${value.jsonRepresentation()}');
-        userID = value.userId;
-      });
-      return userID.toString();
-    } catch (e) {
-      print('error in getting user id  is $e');
-      return 'error';
-    }
-  }
 
   Future<void> signUp(String username, String rollNo, String email,
       String phone, BuildContext context) async {
     try {
-      String? userID = await getUserID();
+      String? userID = await FirebaseMessaging.instance.getToken();
       print('user id is $userID');
       if (!context.mounted) return;
       final response = await http.post(
@@ -105,62 +94,11 @@ class NodeApis {
           .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
-
-  Future<void> logIn(
-    String email,
-    String password,
-    BuildContext context,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
-      final String cookies = response.headers['set-cookie'] ?? '';
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      pref.setString('cookie', cookies);
-      print('login request body is  : ${jsonDecode(response.body)}');
-      if (!context.mounted) return;
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged in succesfully')));
-        Navigator.pushReplacementNamed(context, '/home');
-
-        print(jsonDecode(response.body));
-        print(
-            'after login currentuser and currentemail is $currentUser and $currentEmail');
-      } else if (response.statusCode == 410) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
-          'Invalid Password',
-          style: TextStyle(color: Colors.pinkAccent),
-        )));
-      } else if (response.statusCode == 500) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Something went wrong')));
-      } else if (response.statusCode == 411) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('User not found')));
-      }
-    } catch (e) {
-      // ScaffoldMessenger.of(context)
-      //     .showSnackBar(SnackBar(content: Text('login function\'s error is ${e.toString()}')));
-      print('login function\'s error is ${e.toString()}');
-    }
-  }
-
   Future<void> logout(BuildContext context) async {
-    currentEmail = '';
-    currentUser = '';
-    Navigator.pushReplacementNamed(context, '/login');
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.remove('cookie');
+    // Navigator.pushReplacementNamed(context, '/login');
   }
-
   Future<Map> getContacts(String email) async {
     try {
       final response = await http.get(
@@ -177,7 +115,6 @@ class NodeApis {
       return {};
     }
   }
-
   Future<Map> sendOtp(String route, String to, bool isEmail) async {
     try {
       String through = 'phone';
@@ -201,7 +138,6 @@ class NodeApis {
       return {'message': 'error : $e '};
     }
   }
-
   Future<Map> verifyOtp(
       String route, String to, String otp, bool isEmail) async {
     try {
@@ -220,23 +156,26 @@ class NodeApis {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+      final String cookies = response.headers['set-cookie'] ?? '';
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString('cookie', cookies);
       print('this is response after verifying the otp ${response.body}');
+
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
       return {};
     }
   }
-
   Future<bool> checkLogin() async {
     try {
-      final dynamic data = await getCurrentUser();
+       dynamic data = await getCurrentUser();
       print('data is $data');
+      data = data['data'];
       if (data == null || data == '' || data == {}) {
         print('returning false');
         return false;
-      }
-      else {
+      } else {
         print('returning true');
         return true;
       }
@@ -245,7 +184,6 @@ class NodeApis {
       return false;
     }
   }
-
   Future<dynamic> getCurrentUser() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -268,5 +206,36 @@ class NodeApis {
       print('error in getting the user is : $e');
       return '';
     }
+  }
+  Future<dynamic> saveProfile(
+      String email, String name, File image, String rollNo) async {
+    print('email is $email and name is $name');
+    try {
+    var formData = FormData.fromMap({
+      'avatar': await MultipartFile.fromFile(image.path, filename: name),
+      "email": email,
+      "name": name,
+      "rollNO": rollNo,
+    });
+      var response = await Dio().post(
+       '$baseUrl/update',
+        data: formData,
+      );
+      print('this is response after saving the profile ${response.data.toString()}');
+      return response.data;
+    }
+    catch (e) {
+      print('error in saving profile is: $e');
+      return {};
+    }
+  }
+  Future<List<int>> compressImage(List<int> imageBytes) async {
+    // Decode image bytes to Image object
+    img.Image image = img.decodeImage(imageBytes as Uint8List)!;
+    // Resize the image to reduce dimensions
+    image = img.copyResize(image, width: 800); // Resize to a width of 800 pixels, maintaining aspect ratio
+    // Encode the image to JPEG format with specified quality (0-100)
+    List<int> compressedImageBytes = img.encodeJpg(image, quality: 80);
+    return compressedImageBytes;
   }
 }

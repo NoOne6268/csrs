@@ -91,13 +91,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         // print('to is ${widget.email!} ${widget.phone!}');
                         print('isEmail is ${widget.isEmail!}');
                         if (widget.nextRoute == 'signup/phone') {
+                          // verifying otp sent on email for signup process
                           nodeApis
                               .verifyOtp('signup/verify', widget.email!,
                                   otpController.text, true)
                               .then((value) {
                             print('value is $value');
-                            // ScaffoldMessenger.of(context).showSnackBar(
-                            //     SnackBar(content: Text('${value['message']}')));
+
                             final snackBar = SnackBar(
                               elevation: 0,
                               behavior: SnackBarBehavior.floating,
@@ -113,7 +113,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             ScaffoldMessenger.of(context)
                               ..hideCurrentSnackBar()
                               ..showSnackBar(snackBar);
-                            print('value of succes is , ${value['success']}');
+                            print('value of success is , ${value['success']}');
+                            // if verified to be true, then redirect user to verify phone no
                             if (value['success'] == true) {
                               context
                                   .pushNamed('signup/phone', queryParameters: {
@@ -124,6 +125,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           });
                         }
                         else if (widget.nextRoute == 'home') {
+                          // verifying otp sent on phone for login process
                           print('otp is ${otpController.text}');
 
                           String to = widget.isEmail == 'true'
@@ -144,13 +146,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           });
                         }
                         else if (widget.nextRoute == 'profile') {
+                          // user is created after verifying otp sent on phone
                           nodeApis
                               .signUp('setyourname', widget.rollNo!,
                                   widget.email!, widget.phone!, context)
                               .then((value) {
                             print('sign up api is called');
                           });
-                          context.push('/profile');
+                          //then redirected to create profile
+                          context.pushNamed('/profile/create' , queryParameters: {
+                            'email': widget.email!,
+                            'rollNo': widget.rollNo!,
+                          });
                         }
                         // context.go('/home');
                       }

@@ -13,12 +13,6 @@ import 'package:flutter/foundation.dart';
 import 'package:popover/popover.dart';
 import '../utils/custom_widgets.dart';
 
-Future<void> checkCurrentUser() async {
-  NodeApis nodeApis = NodeApis();
-  Map? user = await nodeApis.getCurrentUser();
-  print('currentuser is  : ${user.toString()}');
-}
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -27,6 +21,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  dynamic user = {};
+
+  Future<void> checkCurrentUser() async {
+    NodeApis nodeApis = NodeApis();
+    user = await nodeApis.getCurrentUser();
+    print('current user got is : $user');
+
+    setState(() {
+      user = user['data'];
+    });
+    print('currentuser is  : ${user.toString()}');
+  }
+
+  @override
+  void initState() {
+    checkCurrentUser();
+    setState(() {});
+    super.initState();
+  }
+
   _showAddWidget(BuildContext context) {
     return showDialog(
       context: context,
@@ -92,17 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Colors.black,
                     bodyBuilder: (context) => ListView(
                       children: [
-                            Hero(tag: 'ajdf', child: Text('sjfjslfdjsljfdklj')),
+                        Hero(tag: 'ajdf', child: Text('sjfjslfdjsljfdklj')),
                       ],
                     ),
-
                     onPop: () => print('Popover was popped!'),
                     direction: PopoverDirection.right,
                     width: 200,
                     height: 400,
                     arrowHeight: 15,
                     arrowWidth: 30,
-
                   );
                 },
                 child: const Icon(
@@ -116,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFF506D85),
         ),
       ),
-      drawer:kSideDrawer(context),
+      drawer: kSideDrawer(context, user['username'].toString(),
+          user['rollNo'].toString(), user['imageUrl'].toString(), user['email'].toString()),
       backgroundColor: const Color(0xFFBBE1FA),
       body: Center(
         child: Column(
@@ -184,7 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 'assets/add_contact.png',
                 'Profile',
                 onEvent: () {
-                  context.push('/profile/edit');
+                  context.pushNamed('profile/edit' , queryParameters: {
+                    'email' : user['email'].toString(),
+                    'name' : user['username'].toString(),
+                    'rollNo' : user['rollNo'].toString(),
+                    'imageUrl' : user['imageUrl'].toString(),
+                  });
                 },
               ),
             ],
@@ -277,9 +295,3 @@ _initiateSOSAlert(BuildContext context, int time) async {
     },
   );
 }
-
-
-
-
-
-

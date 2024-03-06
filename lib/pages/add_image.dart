@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -9,19 +10,22 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileImage extends StatefulWidget {
-
   const ProfileImage({
     super.key,
-    required String rollNo,
-    required String email,
+    required this.email,
+    required this.rollNo,
   });
+
+  final String? email;
+  final String? rollNo;
+
   // final String initials;
   @override
   State<ProfileImage> createState() => _ProfileImageState();
 }
 
 class _ProfileImageState extends State<ProfileImage> {
-  File? _image;
+  XFile? _image;
   bool state = false;
   final _formKey = GlobalKey<FormState>();
   NodeApis nodeApis = NodeApis();
@@ -30,7 +34,6 @@ class _ProfileImageState extends State<ProfileImage> {
   late SharedPreferences prefs;
 
   void saveImage(CroppedFile image) async {
-
     final path = directory.path;
     final fileName = basename(image.path);
     final fileExtension = extension(image.path);
@@ -50,7 +53,6 @@ class _ProfileImageState extends State<ProfileImage> {
     prefs = await SharedPreferences.getInstance();
     directory = await getApplicationDocumentsDirectory();
     setState(() {});
-
   }
 
   @override
@@ -85,7 +87,7 @@ class _ProfileImageState extends State<ProfileImage> {
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: SizedBox(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 0.6,
           width: MediaQuery.of(context).size.width,
           child: Form(
             key: _formKey,
@@ -97,7 +99,7 @@ class _ProfileImageState extends State<ProfileImage> {
                   child: Stack(
                     children: [
                       CircleAvatar(
-                        radius: 100,
+                        radius: 70,
                         backgroundImage:
                             const AssetImage('assets/static_profile.png'),
                         foregroundImage:
@@ -123,14 +125,12 @@ class _ProfileImageState extends State<ProfileImage> {
                           onPressed: () async {
                             final file = await ImagePicker()
                                 .pickImage(source: ImageSource.camera);
-                            final croppedFile =
-                                await ImageCropper().cropImage(
+                            final croppedFile = await ImageCropper().cropImage(
                               sourcePath: file!.path,
                               uiSettings: [
                                 AndroidUiSettings(
                                   lockAspectRatio: true,
-                                  initAspectRatio:
-                                      CropAspectRatioPreset.square,
+                                  initAspectRatio: CropAspectRatioPreset.square,
                                   hideBottomControls: true,
                                 ),
                                 IOSUiSettings(
@@ -141,6 +141,9 @@ class _ProfileImageState extends State<ProfileImage> {
                             );
 
                             saveImage(croppedFile!);
+                            setState(() {
+                              _image = croppedFile as XFile;
+                            });
                           },
                           child: const Icon(
                             Icons.edit,
@@ -173,7 +176,6 @@ class _ProfileImageState extends State<ProfileImage> {
                         )
                       ],
                     );
-
                     saveImage(croppedFile!);
                   },
                   child: const Text(
@@ -197,83 +199,39 @@ class _ProfileImageState extends State<ProfileImage> {
                 TextButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF506D85),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50),),
-                    padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 4.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 26.0, vertical: 4.0),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      if (_image == null) {
-                        setState(() {});
+                      var response = await nodeApis.saveProfile(
+                          widget.email!,
+                          nameController.text,
+                          File(prefs.getString('profile_photo')!),
+                          widget.rollNo!);
+                      print('response is ${response['status']}');
+                      if (response['status'] == 'success') {
+                        print('hello world');
+                       context.push('/home');
                       }
-                      // nodeApis.updateProfile(_image!, "email");
-                      // Navigator.pushNamed(context, '/home');
+
                     }
-                    // Navigator.pushNamed(context, '/home');
                   },
-                  child: const Text('Save', style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                  ),),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                    ),
+                  ),
                 )
               ],
             ),
           ),
-
         ),
-      ),
-    );
-  }
-}
-
-class ListItems extends StatelessWidget {
-  const ListItems({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView(
-        padding: const EdgeInsets.all(8),
-        children: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              height: 50,
-              color: Colors.amber[100],
-              child: const Center(child: Text('Entry A')),
-            ),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[200],
-            child: const Center(child: Text('Entry B')),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[300],
-            child: const Center(child: Text('Entry C')),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[400],
-            child: const Center(child: Text('Entry D')),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[500],
-            child: const Center(child: Text('Entry E')),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[600],
-            child: const Center(child: Text('Entry F')),
-          ),
-        ],
       ),
     );
   }
