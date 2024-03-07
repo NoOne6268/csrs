@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:csrs/services/local_notification_service.dart';
 import 'package:csrs/services/send_notification.dart';
 import 'package:csrs/services/sms_service.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:csrs/utils/side_drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/cupertino.dart';
@@ -153,12 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // LocalNotificationService.showLocalNotification(
-                //     'SOS is ON!!', 'Help is on the way.');
-                // SendNotificationServices.sendNotificationToContacts(
-                //     'title', 'body', true, 'harsagra3478@gmail.com');
-                SMSService.sendSMSToContacts(
-                    'harsagra3478@gmail.com', 'message');
+               kSnackBar(context, 'message' , 'title', ContentType.warning);
               },
               child: const Text('testing button'),
             ),
@@ -190,7 +187,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Contacts',
                 size: 45,
                 onEvent: () {
-                  context.push('/contacts');
+                  context.pushNamed('contacts',
+                    queryParameters: {
+                      'email': user['email'].toString(),
+                    },);
                 },
               ),
               kBottomNavItem(
@@ -213,85 +213,5 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class ListItems extends StatelessWidget {
-  const ListItems({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView(
-        padding: const EdgeInsets.all(8),
-        children: [
-          InkWell(
-            onTap: () {},
-            child: Container(
-              height: 50,
-              color: Colors.amber[100],
-              child: const Center(child: Text('Entry A')),
-            ),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[200],
-            child: const Center(child: Text('Entry B')),
-          ),
-          const Divider(),
-          Container(
-            height: 50,
-            color: Colors.amber[300],
-            child: const Center(child: Text('Entry C')),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-_initiateSOSAlert(BuildContext context, int time) async {
-  if (time == 0) {
-    if (kDebugMode) {
-      print('times is 0 now ');
-    }
-    // fetchContacts();
-    Navigator.of(context).pop(); // Dismiss alert dialog
-  }
-
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    // false = user must tap button, true = tap outside dialog
-    builder: (BuildContext dialogContext) {
-      return AlertDialog(
-        title: const Text('SOS will be initiated in ...',
-            style: TextStyle(
-              fontSize: 30.0,
-              color: Colors.black,
-            )),
-        content: Container(
-          margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-          child: Text('$time',
-              style: const TextStyle(
-                  fontSize: 50.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Roboto')),
-        ),
-        contentPadding: const EdgeInsets.all(10.0),
-        actions: <Widget>[
-          TextButton(
-            child: const Text(
-              'cancel',
-              style: TextStyle(fontSize: 30, color: Colors.pinkAccent),
-            ),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-              Navigator.of(context).pop(); // Dismiss alert dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +12,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfile extends StatefulWidget {
-  const EditProfile({
-    super.key,
-    required this.email,
-    required this.rollNo,
-    required this.name,
-    required this.imageUrl
-  });
+  const EditProfile(
+      {super.key,
+      required this.email,
+      required this.rollNo,
+      required this.name,
+      required this.imageUrl});
+
   final String? email;
   final String? rollNo;
   final String? name;
   final String? imageUrl;
+
   // final String initials;
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -33,8 +36,7 @@ class _EditProfileState extends State<EditProfile> {
   NodeApis nodeApis = NodeApis();
   TextEditingController nameController = TextEditingController();
   TextEditingController rollNoController = TextEditingController();
-
-
+  bool isLoading = false;
   late Directory directory;
   late SharedPreferences prefs;
 
@@ -57,18 +59,14 @@ class _EditProfileState extends State<EditProfile> {
   void getFilePath() async {
     prefs = await SharedPreferences.getInstance();
     directory = await getApplicationDocumentsDirectory();
-    setState(() {
-      if (prefs.getString('profile_photo') != null) {
-        _image = File(prefs.getString('profile_photo')!);
-      }
-    });
+    setState(() {});
   }
 
   @override
   void initState() {
-      nameController.text = widget.name!;
-      rollNoController.text = widget.rollNo!;
-      prefs.remove('profile_photo');
+    nameController.text = widget.name!;
+    rollNoController.text = widget.rollNo!;
+
     getFilePath();
 
     super.initState();
@@ -97,157 +95,226 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
 
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.7,
-          width: MediaQuery.of(context).size.width,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 80,
-                        backgroundImage:
-                            const AssetImage('assets/static_profile.png'),
-                        foregroundImage: (prefs.getString('profile_photo') == null
-                            ? widget.imageUrl == null
-                            ? null as ImageProvider<Object>?
-                            : NetworkImage(widget.imageUrl!)
-                            : FileImage(File(prefs.getString('profile_photo')!))),
+      body: isLoading
+          ? const Center(
+        heightFactor: 10,
+              widthFactor: 10,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                 Text('Please wait...'),
+                SizedBox(height: 20),
+                CircularProgressIndicator(),
+              ],
+            ))
+          : SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                width: MediaQuery.of(context).size.width,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 80,
+                              backgroundImage:
+                                  const AssetImage('assets/static_profile.png'),
+                              foregroundImage: (prefs
+                                          .getString('profile_photo') ==
+                                      null
+                                  ? widget.imageUrl == null
+                                      ? null as ImageProvider<Object>?
+                                      : NetworkImage(widget.imageUrl!)
+                                  : FileImage(
+                                      File(prefs.getString('profile_photo')!))),
+                            ),
+                            Positioned(
+                              bottom: 1,
+                              right: 1,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    elevation: 6.0,
+                                    padding: const EdgeInsets.all(10.0),
+                                    shape: const CircleBorder(
+                                      side: BorderSide.none,
+                                    )),
+                                onPressed: () async {
+                                  final file = await ImagePicker()
+                                      .pickImage(source: ImageSource.camera);
+                                  final croppedFile =
+                                      await ImageCropper().cropImage(
+                                    sourcePath: file!.path,
+                                    uiSettings: [
+                                      AndroidUiSettings(
+                                        lockAspectRatio: true,
+                                        initAspectRatio:
+                                            CropAspectRatioPreset.square,
+                                        hideBottomControls: true,
+                                      ),
+                                      IOSUiSettings(
+                                        aspectRatioLockEnabled: true,
+                                        aspectRatioPickerButtonHidden: true,
+                                      )
+                                    ],
+                                  );
 
-                      ),
-                      Positioned(
-                        bottom: 1,
-                        right: 1,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              elevation: 6.0,
-                              padding: const EdgeInsets.all(10.0),
-                              shape: const CircleBorder(
-                                side: BorderSide.none,
-                              )),
-                          onPressed: () async {
-                            final file = await ImagePicker()
-                                .pickImage(source: ImageSource.camera);
-                            final croppedFile = await ImageCropper().cropImage(
-                              sourcePath: file!.path,
-                              uiSettings: [
-                                AndroidUiSettings(
-                                  lockAspectRatio: true,
-                                  initAspectRatio: CropAspectRatioPreset.square,
-                                  hideBottomControls: true,
+                                  saveImage(croppedFile!);
+                                },
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Colors.black,
                                 ),
-                                IOSUiSettings(
-                                  aspectRatioLockEnabled: true,
-                                  aspectRatioPickerButtonHidden: true,
-                                )
-                              ],
-                            );
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final file = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
+                          final croppedFile = await ImageCropper().cropImage(
+                            sourcePath: file!.path,
+                            uiSettings: [
+                              AndroidUiSettings(
+                                lockAspectRatio: true,
+                                initAspectRatio: CropAspectRatioPreset.square,
+                                hideBottomControls: true,
+                              ),
+                              IOSUiSettings(
+                                aspectRatioLockEnabled: true,
+                                aspectRatioPickerButtonHidden: true,
+                              )
+                            ],
+                          );
 
-                            saveImage(croppedFile!);
-                          },
-                          child: const Icon(
-                            Icons.edit,
-                            size: 20,
-                            color: Colors.black,
+                          saveImage(croppedFile!);
+                        },
+                        child: const Text(
+                          "Upload from Gallery",
+                          style: TextStyle(
+                            fontSize: 23,
+                            color: const Color(0xFF506D85),
                           ),
                         ),
+                      ),
+                      kAuthFormField(
+                        nameController,
+                        'Name',
+                        'Name',
+                        key: const ValueKey('name'),
+                        onLogin: true,
+                      ),
+                      kAuthFormField(
+                        rollNoController,
+                        'Roll No',
+                        'Roll No can\'t be empty',
+                        key: const ValueKey('rollNo'),
+                        onLogin: true,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        textBaseline: TextBaseline.alphabetic,
+                        textDirection: TextDirection.ltr,
+                        children: [
+                          TextButton(
+                            style: ElevatedButton.styleFrom(
+                              visualDensity: VisualDensity.comfortable,
+                              backgroundColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 26.0, vertical: 4.0),
+                            ),
+                            onPressed: () async {
+                              context.pop();
+                            },
+                            child: const Text(
+                              'Back',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF506D85),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 26.0, vertical: 4.0),
+                            ),
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                if (prefs.getString('profile_photo') == null &&
+                                    widget.imageUrl == null) {
+                                  kSnackBar(
+                                      context,
+                                      'Please upload a profile photo',
+                                      'false',
+                                      ContentType.warning);
+                                  return;
+                                }
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                Map<String, dynamic> response;
+                                response = await nodeApis.saveProfile(
+                                    widget.email!,
+                                    nameController.text,
+                                    File(prefs.getString('profile_photo')!),
+                                    rollNoController.text);
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                kSnackBar(
+                                    context,
+                                    response['status'] == 'success'
+                                        ? 'profile updated successfully'
+                                        : "Something went wrong!!",
+                                    response['status'],
+                                    response['status'] == 'success'
+                                        ? ContentType.success
+                                        : ContentType.failure);
+                                if (response['status'] == 'success') {
+                                  context.push('/home');
+                                }
+                              }
+                            },
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                              ),
+                            ),
+                          ),
+                        ],
                       )
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final file = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    final croppedFile = await ImageCropper().cropImage(
-                      sourcePath: file!.path,
-                      uiSettings: [
-                        AndroidUiSettings(
-                          lockAspectRatio: true,
-                          initAspectRatio: CropAspectRatioPreset.square,
-                          hideBottomControls: true,
-                        ),
-                        IOSUiSettings(
-                          aspectRatioLockEnabled: true,
-                          aspectRatioPickerButtonHidden: true,
-                        )
-                      ],
-                    );
-
-                    saveImage(croppedFile!);
-                  },
-                  child: const Text(
-                    "Upload from Gallery",
-                    style: TextStyle(
-                      fontSize: 23,
-                      color: const Color(0xFF506D85),
-                    ),
-                  ),
-                ),
-                kAuthFormField(
-                  nameController,
-                  'Name',
-                  'Name',
-                  key: const ValueKey('name'),
-                  onLogin: true,
-                ),
-                kAuthFormField(
-                  rollNoController,
-                  'Roll No',
-                  'Roll No can\'t be empty',
-                  key: const ValueKey('rollNo'),
-                  onLogin: true,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF506D85),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 26.0, vertical: 4.0),
-                  ),
-                  onPressed: () async{
-                    if (_formKey.currentState!.validate()) {
-                      var response = await nodeApis.saveProfile(
-                          widget.email!,
-                          nameController.text,
-                          File(prefs.getString('profile_photo')!),
-                          rollNoController.text);
-                      print('response is ${response['status']}');
-                      if (response['status'] == 'success') {
-                        print('hello world');
-                        context.push('/home');
-                      }
-                    }
-                  },
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                    ),
-                  ),
-                )
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -145,10 +145,13 @@ Padding kAuthFormField(
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
     child: TextFormField(
       key: key,
-      keyboardType: hintText == 'Phone No' ? TextInputType.phone : TextInputType.text,
+      keyboardType: hintText == 'Phone No' || hintText == "OTP"? TextInputType.phone : TextInputType.text,
       validator: (value) {
         if (value!.isEmpty) {
           return isEmpty;
+        }
+        if(hintText == 'Phone No' && value.length != 10){
+          return 'Invalid phone number';
         }
         return null;
       },
@@ -169,10 +172,62 @@ Padding kAuthFormField(
               (onLogin ? const Color(0x8090BDDB) : const Color(0x80FFFFFF)),
           hintText: hintText,
           hintStyle: const TextStyle(
-            fontSize: 25,
+            fontSize: 24,
           ),
 
-          suffixText: hintText == 'Insti mail' ? '@kgpian.iitkgp.ac.in' : '',
+          suffixText: hintText == 'Institute mail' ? '@kgpian.iitkgp.ac.in' : '',
+          suffixStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 23,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Colors.white),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Colors.black),
+          )),
+    ),
+  );
+}
+Padding kAuthFormFieldRollNo(
+    TextEditingController controller,
+    {required Key key}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+    child: TextFormField(
+      key: key,
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'This field can\'t be empty';
+        }
+        final isValid = RegExp(r'^\d{2}[A-Z]{2}\d{5}$').hasMatch(value);
+        if (!isValid) {
+          return 'Invalid roll number format';
+        }
+        return null;
+      },
+      style: const TextStyle(
+        fontSize: 25,
+        shadows: [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 2.0,
+          ),
+        ],
+      ),
+
+      controller: controller,
+      decoration: InputDecoration(
+          filled: true,
+          fillColor:
+           const Color(0x80FFFFFF),
+          hintText: "Roll No",
+          hintStyle: const TextStyle(
+            fontSize: 25,
+          ),
           suffixStyle: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 23,

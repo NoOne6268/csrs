@@ -88,7 +88,9 @@ Drawer kSideDrawer(BuildContext context, String name, String rollNo,
             color: Colors.black,
           ),
           onTap: () {
-            context.push('/contacts');
+            context.pushNamed('contacts' , queryParameters: {
+              'email': email,
+            });
           },
         ),
         const ListTile(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ContactServices {
   const ContactServices._();
@@ -26,6 +27,8 @@ class ContactServices {
       );
       print('this is response after saving the contact ${response.body}');
       if (response.statusCode == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.remove('contacts');
         return {
           'message': jsonDecode(response.body)['message'],
           'status': true
@@ -55,6 +58,8 @@ class ContactServices {
         }),
       );
       print('this is response after deleting the contact ${response.body}');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('contacts');
       return 'true';
     }
     catch (e) {
@@ -72,6 +77,9 @@ class ContactServices {
         },
       );
       print('this is response after getting the contacts ${response.body}');
+      SharedPreferences prefs= await SharedPreferences.getInstance();
+      prefs.setString('contacts', response.body);
+      print('contacts is saved in contacts shared preferences');
       return jsonDecode(response.body);
     } catch (e) {
       print(e);

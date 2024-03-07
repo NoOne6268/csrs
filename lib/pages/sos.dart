@@ -38,6 +38,7 @@ class _SosScreenState extends State<SosScreen> {
     getContact();
     LocalNotificationService.showLocalNotification(
         'SOS is ON!!', 'Help is on the way.');
+    String message = 'Location : I am in trouble please help me out!! This alert is generated through CSRS app';
     SendNotificationServices.sendNotificationToContacts(
         'title', 'body', true, 'harsagra3478@gmail.com');
     SMSService.sendSMSToContacts('harsagra3478@gmail.com', 'message');

@@ -117,7 +117,9 @@ final GoRouter _router = GoRouter(
           path: 'contacts',
           name: 'contacts',
           builder: (BuildContext context, GoRouterState state) {
-            return const ContactScreen();
+            return  ContactScreen(
+              email: state.uri.queryParameters['email'],
+            );
           },
         ),
       ],

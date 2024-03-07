@@ -8,10 +8,12 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/models/contact.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/custom_widgets.dart';
 
 class ContactScreen extends StatefulWidget {
-  const ContactScreen({super.key});
+  const ContactScreen({super.key , required this.email});
+  final String? email;
 
   @override
   State<ContactScreen> createState() => _ContactScreenState();
@@ -25,14 +27,31 @@ class _ContactScreenState extends State<ContactScreen> {
   List<MyContact> contacts = [];
 
   void getContact() async {
-    var response = await ContactServices.getContacts('harsagra3478@gmail.com');
-    setState(() {
-      var responseData = response['data'];
-      contacts =
-          createContactsFromData(responseData.cast<Map<String, dynamic>>());
-      isLoading = false;
-    });
-    print('response is : ${response['data']}');
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.remove('contacts');
+      if(prefs.getString('contacts') == null){
+        var response = await ContactServices.getContacts(widget.email!);
+        setState(() {
+          var responseData = response['data'];
+          contacts =
+              createContactsFromData(responseData.cast<Map<String, dynamic>>());
+          isLoading = false;
+        });
+        print('response is : ${response['data']}');
+      }
+      else{
+        setState(() {
+          var responseData = prefs.getString('contacts');
+          var data = jsonDecode(responseData!);
+          data = data['data'];
+          print('response data is : $data');
+          contacts =
+              createContactsFromData(data.cast<Map<String, dynamic>>());
+          isLoading = false;
+        });
+      }
+
   }
 
   @override
@@ -75,7 +94,7 @@ class _ContactScreenState extends State<ContactScreen> {
                           cancelBtnText: 'No',
                           onConfirmBtnTap: () async {
                             await ContactServices.deleteContact(
-                                'harsagra3478@gmail.com',
+                                widget.email!,
                                 contacts[index].contactPhone!);
                             setState(() {
                               contacts.removeAt(index);
@@ -138,7 +157,7 @@ class _ContactScreenState extends State<ContactScreen> {
               contacts.add(myContact);
             });
             var response = await ContactServices.saveContact(
-                'harsagra3478@gmail.com',
+                widget.email!,
                 myContact.contactName!,
                 myContact.contactPhone);
             print('response is : ${response['message']}');

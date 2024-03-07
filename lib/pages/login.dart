@@ -1,4 +1,5 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     kAuthFormField(
                         emailController,
-                        isPhone ? 'Phone No' : 'Insti mail',
+                        isPhone ? 'Phone No' : 'Institute mail',
                         'email can\'t be empty',
                         key: const ValueKey('email'),
                         onLogin: true),
@@ -95,54 +96,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'Send OTP',
                         onPress: () async {
                           if (_formKey.currentState!.validate()) {
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //     const SnackBar(
-                            //       content: Text('Processing Data'),
-                            //     ),
-                            //   );
-                            final snackBar = SnackBar(
-                              elevation: 0,
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.transparent,
-                              content: Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                child: Center(
-                                  child: AwesomeSnackbarContent(
-                                    title: 'Validating data !! ',
-                                    message: '',
-                                    contentType: ContentType.help,
-                                  ),
-                                ),
-                              ),
-                            );
-
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(snackBar);
-
                             if (isPhone) {
                               var response = await nodeApis.sendOtp(
                                   'login/phone', emailController.text, false);
                               print('response is $response');
-                              // ScaffoldMessenger.of(context).showSnackBar(
-                              //     const SnackBar(content: Text('Sending otp')));
-                              final snackBar = SnackBar(
-                                elevation: 0,
-                                behavior: SnackBarBehavior.values[1],
-                                backgroundColor: Colors.transparent,
-                                content: AwesomeSnackbarContent(
-                                  title: 'Sending otp!!',
-                                  message: '',
-                                  contentType: ContentType.help,
-                                ),
-                              );
-                              ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(snackBar);
+                              kSnackBar(
+                                  context,
+                                  response['message'],
+                                  response['success'].toString(),
+                                  response['success'] == true
+                                      ? ContentType.success
+                                      : ContentType.warning);
                               if (response['success'] == true) {
-                                context.goNamed('verifyotp', queryParameters: {
+                                context
+                                    .pushNamed('verifyotp', queryParameters: {
                                   'loginOrRegister': 'login',
                                   'nextRoute': 'home',
                                   'isEmail': 'false',
@@ -155,27 +122,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '${emailController.text}@kgpian.iitkgp.ac.in',
                                   true);
                               print('response is $response');
-                              final snackBar = SnackBar(
-                                elevation: 10,
-                                behavior: SnackBarBehavior.values[1],
-                                backgroundColor: Colors.transparent,
-                                content: AwesomeSnackbarContent(
-                                  title:
-                                      response['success'].toString() == 'false'
-                                          ? 'Failed'
-                                          : 'True',
-                                  message: response['message'],
-                                  contentType:
-                                      response['success'].toString() == 'false'
-                                          ? ContentType.failure
-                                          : ContentType.success,
-                                ),
-                              );
-                              ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(snackBar);
+                              kSnackBar(
+                                  context,
+                                  response['message'],
+                                  response['success'].toString(),
+                                  response['success'] == true
+                                      ? ContentType.success
+                                      : ContentType.warning);
                               if (response['success'] == true) {
-                                context.goNamed(
+                                context.pushNamed(
                                   'verifyotp',
                                   queryParameters: {
                                     'loginOrRegister': 'login',

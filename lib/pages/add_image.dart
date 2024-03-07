@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
@@ -53,11 +55,13 @@ class _ProfileImageState extends State<ProfileImage> {
     prefs = await SharedPreferences.getInstance();
     directory = await getApplicationDocumentsDirectory();
     setState(() {});
+    prefs.remove('profile_photo');
   }
 
   @override
   void initState() {
     getFilePath();
+
     super.initState();
   }
 
@@ -213,11 +217,19 @@ class _ProfileImageState extends State<ProfileImage> {
                           File(prefs.getString('profile_photo')!),
                           widget.rollNo!);
                       print('response is ${response['status']}');
+                      kSnackBar(
+                          context,
+                          response['success'] == 'success'
+                              ? 'profile updated successfully'
+                              : "Something went wrong!!",
+                          response['success'],
+                          response['success'] == 'success'
+                              ? ContentType.success
+                              : ContentType.failure);
                       if (response['status'] == 'success') {
                         print('hello world');
-                       context.push('/home');
+                        context.push('/login');
                       }
-
                     }
                   },
                   child: const Text(

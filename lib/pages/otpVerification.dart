@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:csrs/services/node_authorization.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -34,140 +35,131 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: Color(0xFF90BDDB),
-            size: 35,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Hero(
-            tag: 'logo',
-            child: Image.asset(
-              'assets/icon_flutter.png',
-              height: 175,
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Color(0xFF90BDDB),
+              size: 35,
             ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24)),
-                color: Color(0xFF90BDDB),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Hero(
+              tag: 'logo',
+              child: Image.asset(
+                'assets/icon_flutter.png',
+                height: 175,
               ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    kAuthFormField(
-                      otpController,
-                      'OTP',
-                      'otp cannot be empty',
-                      key: const ValueKey('otp'),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    kAuthOtpButton(context,
-                        textColor: Colors.white,
-                        bgColor: Colors.black,
-                        text: widget.loginOrRegister!, onPress: () {
-                      if (_formKey.currentState!.validate()) {
-                        // print('to is ${widget.email!} ${widget.phone!}');
-                        print('isEmail is ${widget.isEmail!}');
-                        if (widget.nextRoute == 'signup/phone') {
-                          // verifying otp sent on email for signup process
-                          nodeApis
-                              .verifyOtp('signup/verify', widget.email!,
-                                  otpController.text, true)
-                              .then((value) {
-                            print('value is $value');
-
-                            final snackBar = SnackBar(
-                              elevation: 0,
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.transparent,
-                              content: AwesomeSnackbarContent(
-                                title: value['success'] == true ? 'Success' : 'Failure',
-                                message:
-                                value['message'],
-                                contentType: value['success'] == true ? ContentType.success : ContentType.failure,
-                              ),
-                            );
-
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(snackBar);
-                            print('value of success is , ${value['success']}');
-                            // if verified to be true, then redirect user to verify phone no
-                            if (value['success'] == true) {
-                              context
-                                  .pushNamed('signup/phone', queryParameters: {
-                                'email': widget.email!,
-                                'rollNo': widget.rollNo!,
-                              });
-                            }
-                          });
+            ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24)),
+                  color: Color(0xFF90BDDB),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      kAuthFormField(
+                        otpController,
+                        'OTP',
+                        'otp cannot be empty',
+                        key: const ValueKey('otp'),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      kAuthOtpButton(context,
+                          textColor: Colors.white,
+                          bgColor: Colors.black,
+                          text: widget.loginOrRegister!, onPress: () {
+                        if (_formKey.currentState!.validate()) {
+                          // print('to is ${widget.email!} ${widget.phone!}');
+                          print('isEmail is ${widget.isEmail!}');
+                          if (widget.nextRoute == 'signup/phone') {
+                            // verifying otp sent on email for signup process
+                            nodeApis
+                                .verifyOtp('signup/verify', widget.email!,
+                                    otpController.text, true)
+                                .then((value) {
+                              kSnackBar(
+                                  context,
+                                  value['success'] == true
+                                      ? 'OTP verified successfully!!'
+                                      : 'OTP verification failed!!',
+                                  value['success'].toString(),
+                                  value['success'] == true
+                                      ? ContentType.success
+                                      : ContentType.failure);
+                              // if verified to be true, then redirect user to verify phone no
+                              if (value['success'] == true) {
+                                context.pushNamed('signup/phone',
+                                    queryParameters: {
+                                      'email': widget.email!,
+                                      'rollNo': widget.rollNo!,
+                                    });
+                              }
+                            });
+                          } else if (widget.nextRoute == 'home') {
+                            // verifying otp sent on phone for login process
+                            print('otp is ${otpController.text}');
+                            String to = widget.isEmail == 'true'
+                                ? widget.email!
+                                : widget.phone!;
+                            bool isEmail =
+                                widget.isEmail == 'true' ? true : false;
+                            nodeApis
+                                .verifyOtp('login/verify', to,
+                                    otpController.text, isEmail)
+                                .then((value) {
+                              print('value is $value');
+                              kSnackBar(
+                                  context,
+                                  value['message'],
+                                  value['success'].toString(),
+                                  value['success'] == true
+                                      ? ContentType.success
+                                      : ContentType.failure);
+                              if (value['success'] == true) {
+                                context.push('/home');
+                              }
+                            });
+                          } else if (widget.nextRoute == 'profile') {
+                            // user is created after verifying otp sent on phone
+                            nodeApis
+                                .signUp('setyourname', widget.rollNo!,
+                                    widget.email!, widget.phone!, context)
+                                .then((value) {
+                              print('sign up api is called');
+                            });
+                            //then redirected to create profile
+                          }
+                          // context.go('/home');
                         }
-                        else if (widget.nextRoute == 'home') {
-                          // verifying otp sent on phone for login process
-                          print('otp is ${otpController.text}');
-
-                          String to = widget.isEmail == 'true'
-                              ? widget.email!
-                              : widget.phone!;
-                          bool isEmail =
-                              widget.isEmail == 'true' ? true : false;
-                          nodeApis
-                              .verifyOtp(
-                                  'login/verify', to, otpController.text, isEmail)
-                              .then((value) {
-                            print('value is $value');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${value['message']}')));
-                            if(value['success'] == true) {
-                              context.push('/home');
-                            }
-                          });
-                        }
-                        else if (widget.nextRoute == 'profile') {
-                          // user is created after verifying otp sent on phone
-                          nodeApis
-                              .signUp('setyourname', widget.rollNo!,
-                                  widget.email!, widget.phone!, context)
-                              .then((value) {
-                            print('sign up api is called');
-                          });
-                          //then redirected to create profile
-                          context.pushNamed('/profile/create' , queryParameters: {
-                            'email': widget.email!,
-                            'rollNo': widget.rollNo!,
-                          });
-                        }
-                        // context.go('/home');
-                      }
-                    })
-                  ],
+                      })
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

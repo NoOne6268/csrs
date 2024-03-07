@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
@@ -73,29 +75,34 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         textColor: Colors.black,
                         bgColor: Colors.white,
                         text: 'Send OTP', onPress: () async {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Sending otp')));
+                      if (_formKey.currentState!.validate()) {
+                        var response = await nodeApis.sendOtp(
+                            'signup/phone', phoneController.text, false);
+                        kSnackBar(
+                            context,
+                            response['success'] == true
+                                ? "OTP sent to your phone"
+                                : "Couldn't send, please retry!",
+                            response['success'].toString(),
+                            response['success'] == true
+                                ? ContentType.success
+                                : ContentType.warning);
 
-                            var response = await nodeApis.sendOtp(
-                                'signup/phone', phoneController.text, false);
-                            print('response is $response');
-                            if (response['success'] == true) {
-                              context.pushNamed('verifyotp', queryParameters: {
-                                'loginOrRegister': 'register',
-                                'nextRoute': 'profile',
-                                'isEmail': 'false',
-                                'to': phoneController.text,
-                                'isSignup': 'true',
-                                'rollNo': widget.rollNo!,
-                                'email': widget.email!,
-                                'phone' : phoneController.text,
-                              });
-                            }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(response['message'])));
-                          }
-                        }),
+                        if (response['success'] == true) {
+                          context.pushNamed('verifyotp', queryParameters: {
+                            'loginOrRegister': 'register',
+                            'nextRoute': 'profile',
+                            'isEmail': 'false',
+                            'to': phoneController.text,
+                            'isSignup': 'true',
+                            'rollNo': widget.rollNo!,
+                            'email': widget.email!,
+                            'phone': phoneController.text,
+                          });
+                        }
+
+                      }
+                    }),
                     const HorizontalOrLine(
                       label: "OR",
                       height: 4.0,
@@ -128,5 +135,4 @@ class _SignupScreen2State extends State<SignupScreen2> {
       ),
     );
   }
-
 }
