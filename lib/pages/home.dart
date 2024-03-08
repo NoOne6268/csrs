@@ -13,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:popover/popover.dart';
+import '../services/location.dart';
 import '../utils/custom_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -146,7 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             IconButton(
               onPressed: () {
-                context.push('/cnt');
+                context.pushNamed('/cnt',  queryParameters: {
+                  'email': user['email'].toString(),
+                  'name': user['username'].toString(),
+                });
               },
               icon: SvgPicture.asset('assets/sos_main.svg'),
             ),
@@ -154,8 +158,19 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 30.0,
             ),
             ElevatedButton(
-              onPressed: () {
-               kSnackBar(context, 'message' , 'title', ContentType.warning);
+              onPressed: ()async {
+               Location location = Location();
+               var loc = await location.getLocation();
+               print(loc);
+                String langitude = loc['langitude'].toString();
+                String longitude = loc['longitude'].toString();
+               // print('location is : $langitude, $longitude');
+               String message =
+                   '${user['username'].toString()} is in trouble please help him out!!'
+                   ' This alert is generated through CSRS app. Click to see harshit\'s'
+                   ' location : https://www.google.com/maps/place/$langitude,$longitude';
+               kSnackBar(context, message , 'title', ContentType.warning);
+               print(message);
               },
               child: const Text('testing button'),
             ),

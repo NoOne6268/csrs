@@ -6,7 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../utils/custom_widgets.dart';
 
 class CountdownScreen extends StatefulWidget {
-  const CountdownScreen({super.key});
+  const CountdownScreen({super.key, required this.email, required this.name});
+
+  final String? email;
+  final String? name;
 
   @override
   State<CountdownScreen> createState() => _CountdownScreenState();
@@ -58,7 +61,10 @@ class _CountdownScreenState extends State<CountdownScreen> {
               isReverseAnimation: true,
               autoStart: true,
               onComplete: () {
-                context.pushReplacement('/sos');
+                context.pushNamed('/sos', queryParameters: {
+                  'email': widget.email,
+                  'name': widget.name
+                });
               },
             ),
             const SizedBox(

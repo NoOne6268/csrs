@@ -9,9 +9,13 @@ import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 
 import '../models/contact.dart';
+import '../services/location.dart';
 
 class SosScreen extends StatefulWidget {
-  const SosScreen({super.key});
+  const SosScreen({super.key, required this.email, required this.name});
+
+  final String? email;
+  final String? name;
 
   @override
   State<SosScreen> createState() => _SosScreenState();
@@ -21,6 +25,7 @@ class _SosScreenState extends State<SosScreen> {
   late StatelessWidget emergencyList;
   List<MyContact> contacts = [];
   bool isLoading = true;
+
   void getContact() async {
     var response = await ContactServices.getContacts('harsagra3478@gmail.com');
     setState(() {
@@ -31,17 +36,34 @@ class _SosScreenState extends State<SosScreen> {
     });
     print('response is : ${response['data']}');
   }
+
+  void sosInitiate() async {
+    LocalNotificationService.showLocalNotification(
+        'SOS is ON!!', 'Help is on the way.');
+    //send location coordinates via sms
+    Location location = Location();
+    var loc = await location.getLocation();
+    double langitude = loc['longitude'];
+    double longitude = loc['latitude'];
+    print('location is : $langitude, $longitude');
+    String message =
+        '${widget.name} is in trouble please help him out!!'
+        ' This alert is generated through CSRS app. Click to see ${widget.name}\'s'
+        ' location : https://www.google.com/maps/place/$langitude,$longitude';
+    print(message);
+    SendNotificationServices.sendNotificationToContacts(
+        AutofillHints.creditCardFamilyName,
+        AutofillHints.addressCity,
+        true,
+        widget.email!);
+    SMSService.sendSMSToContacts(widget.email!, message);
+  }
+
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
     super.initState();
     getContact();
-    LocalNotificationService.showLocalNotification(
-        'SOS is ON!!', 'Help is on the way.');
-    String message = 'Location : I am in trouble please help me out!! This alert is generated through CSRS app';
-    SendNotificationServices.sendNotificationToContacts(
-        'title', 'body', true, 'harsagra3478@gmail.com');
-    SMSService.sendSMSToContacts('harsagra3478@gmail.com', 'message');
   }
 
   @override
@@ -94,7 +116,6 @@ class _SosScreenState extends State<SosScreen> {
                           Navigator.of(context).pop();
                         },
                       );
-
                     },
                     child: const Text(
                       'Safe now',
@@ -130,29 +151,32 @@ class _SosScreenState extends State<SosScreen> {
                     Expanded(
                       child: isLoading
                           ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
+                              child: CircularProgressIndicator(),
+                            )
                           : contacts.isNotEmpty
-                          ? ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: contacts.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return kContactTile(
-                            name: contacts[index].contactName!,
-                            imageUri: contacts[index].contactImageUrl ?? '',
-                            phoneNo: contacts[index].contactPhone!,
-                            isDelete: false,
-                            onPress: ()  {
-                            },
-                          );
-                        },
-                      )
-                          : const Center(
-                        child: Text(
-                          'No contacts added yet',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                              ? ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: contacts.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return kContactTile(
+                                      name: contacts[index].contactName!,
+                                      imageUri:
+                                          contacts[index].contactImageUrl ?? '',
+                                      phoneNo: contacts[index].contactPhone!,
+                                      isDelete: false,
+                                      onPress: () {},
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Text(
+                                    'No contacts added yet',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
                     ),
                   ],
                 ),

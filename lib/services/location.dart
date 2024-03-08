@@ -40,6 +40,7 @@ class Location {
   }
 
   Future<Map> getLocation() async {
+    askPermission();
     _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     print('co-ordinates for location is $_position');
     // launchUrl(Uri.parse('https://www.google.com/maps/place/${_position.latitude},${_position.longitude}'));

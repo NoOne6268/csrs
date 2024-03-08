@@ -52,7 +52,10 @@ final GoRouter _router = GoRouter(
           path: 'cnt',
           name: '/cnt',
           builder: (BuildContext context, GoRouterState state) {
-            return const CountdownScreen();
+            return  CountdownScreen(
+              email: state.uri.queryParameters['email'],
+              name : state.uri.queryParameters['name'],
+            );
           },
         ),
         GoRoute(
@@ -66,7 +69,10 @@ final GoRouter _router = GoRouter(
           path: 'sos',
           name: '/sos',
           builder: (BuildContext context, GoRouterState state) {
-            return const SosScreen();
+            return  SosScreen(
+              email: state.uri.queryParameters['email'],
+              name : state.uri.queryParameters['name'],
+            );
           },
         ),
         GoRoute(
@@ -132,7 +138,10 @@ Future<void> interactiveCallback(Uri? data) async {
   if (data == Uri.parse('sosWidget://message?message=clicked')) {
     await HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     navigatorKey.currentState
-        ?.push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+        ?.push(MaterialPageRoute(builder: (_) => const CountdownScreen(
+      email:' User.email',
+      name: 'User.name',
+    )));
   }
 }
 
@@ -184,7 +193,10 @@ class _MyAppState extends State<MyApp> {
   void _launchedFromWidget(Uri? uri) {
     if (uri == Uri.parse('sosWidget://message?message=clicked')) {
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => const CountdownScreen()));
+          .push(MaterialPageRoute(builder: (_) => const CountdownScreen(
+        email:' User.email',
+        name: 'User.name',
+      )));
     }
   }
 
