@@ -137,8 +137,16 @@ class NodeApis {
 
   Future<bool> checkLogin() async {
     try {
-      dynamic data = await getCurrentUser();
-      print('data is $data');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dynamic data = {};
+      if(prefs.getString('currentUser') != null){
+        data = jsonDecode(prefs.getString('currentUser')!);
+        print('getting user from shared prefs and it is : $data');
+      }
+      else{
+        data = await getCurrentUser();
+      }
+      // print('data is $data');
       data = data['data'];
       if (data == null || data == '' || data == {}) {
         print('returning false');
@@ -166,6 +174,8 @@ class NodeApis {
           },
         );
         var data = jsonDecode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('currentUser', jsonEncode(data));
         return data;
       } else {
         print('cookie is empty');
@@ -191,6 +201,10 @@ class NodeApis {
         '$baseUrl/update',
         data: formData,
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // prefs.setString('currentUser', jsonEncode(response.data));
+      prefs.remove('currentUser');
+      print('current user form shared prefs is : ${prefs.getString('currentUser')}');
       print(
           'this is response after saving the profile ${response.data.toString()}');
       return response.data;

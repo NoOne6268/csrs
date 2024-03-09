@@ -310,25 +310,42 @@ Padding kContactTile(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: ((imageUri == null) || (imageUri == '' )
-                ? Image.asset(
-                    'assets/static_profile.png',
-                    height: 55,
-                  )
-                : Image.network(imageUri)),
+          child: CircleAvatar(
+            radius: 35,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: ((imageUri == null) || (imageUri == '' )
+                  ? Image.asset(
+                      'assets/static_profile.png',
+                      height: 55,
+                    )
+                  : Image.network(imageUri)),
+            ),
           ),
         ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              name,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  phoneNo,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+              ],
             ),
           ),
         ),

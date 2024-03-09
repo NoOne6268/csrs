@@ -51,22 +51,21 @@ class NotificationServices {
     return token!;
   }
 
-  void initLocalNotifications(BuildContext context , RemoteMessage message) {
+  void initLocalNotifications(RemoteMessage message) {
     var androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var iosInitializationSettings = const DarwinInitializationSettings();
     var initializationSettings = InitializationSettings(
         android: androidInitializationSettings, iOS: iosInitializationSettings);
     _flutterLocalNotificationsPlugin.initialize(initializationSettings ,
         onDidReceiveNotificationResponse: (payload) async {
-          handleMessage(context , message);
+          handleMessage(message);
           if (kDebugMode) {
             print('notification payload: ${payload.toString()}');
           }
         });
   }
-  void handleMessage(BuildContext context , RemoteMessage message){
+  void handleMessage( RemoteMessage message){
     if(message.data['type'] == 'msj'){
-      // Navigator.push(context , MaterialPageRoute(builder: (context) => const Home()));
       var langitude = double.parse(message.data['langitude']);
       var longitude = double.parse(message.data['longitude']);
       location.redirect(langitude , longitude );
@@ -74,7 +73,10 @@ class NotificationServices {
     }
 
   }
-   void firebaseInit(BuildContext context){
+  Future<void> cancelNotification() async {
+    await _flutterLocalNotificationsPlugin.cancelAll();
+  }
+   void firebaseInit(){
      FirebaseMessaging.onMessage.listen((event) {
        try {
          //remove default from the data , because it is added by firebase , and we are not sending it , so it is causing error , slice first 12 chars and last 1 char
@@ -99,7 +101,7 @@ class NotificationServices {
            print(event.data['type']);
          }
          if(Platform.isAndroid){
-           initLocalNotifications(context , remoteMessage);
+           initLocalNotifications( remoteMessage);
            showNotifications(remoteMessage);
          }else if(Platform.isIOS){
            showNotifications(remoteMessage);
@@ -165,16 +167,16 @@ class NotificationServices {
     });
   }
 
-  void setUpInteractMessage(BuildContext context)async{
+  void setUpInteractMessage()async{
     //when app is terminated
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if(initialMessage != null){
-      handleMessage(context , initialMessage);
+      handleMessage( initialMessage);
     }
     // when app is in background
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
-      handleMessage(context , event);
+      handleMessage(event);
     });
   }
 }

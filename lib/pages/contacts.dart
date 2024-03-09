@@ -156,6 +156,10 @@ class _ContactScreenState extends State<ContactScreen> {
             setState(() {
               contacts.add(myContact);
             });
+            // if +91 is present in the phone number then remove it
+            if (myContact.contactPhone!.startsWith('+91')) {
+              myContact.contactPhone = myContact.contactPhone!.substring(3);
+            }
             var response = await ContactServices.saveContact(
                 widget.email!,
                 myContact.contactName!,

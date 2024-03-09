@@ -219,11 +219,11 @@ class _ProfileImageState extends State<ProfileImage> {
                       print('response is ${response['status']}');
                       kSnackBar(
                           context,
-                          response['success'] == 'success'
+                          response['status'] == 'success'
                               ? 'profile updated successfully'
                               : "Something went wrong!!",
-                          response['success'],
-                          response['success'] == 'success'
+                          response['status'],
+                          response['status'] == 'success'
                               ? ContentType.success
                               : ContentType.failure);
                       if (response['status'] == 'success') {

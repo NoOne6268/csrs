@@ -7,6 +7,7 @@ import 'package:csrs/pages/sos.dart';
 import 'package:csrs/firebase_options.dart';
 import 'package:csrs/pages/welcome.dart';
 import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/location.dart';
 import 'package:csrs/services/receive_notification.dart';
 import 'package:csrs/utils/user.dart';
 import 'package:home_widget/home_widget.dart';
@@ -19,9 +20,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:csrs/pages/countdown_timer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-BuildContext? backgroundContext;
+
 // The route configuration.
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -150,8 +152,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
   print('message is ${message.data}');
-  print('context is $backgroundContext');
-  NotificationServices().setUpInteractMessage(backgroundContext!);
+  _handleMessage();
+  // NotificationServices().setUpInteractMessage(c);
   // _handleMessage(navigatorKey.currentContext!);
 }
 
@@ -163,6 +165,7 @@ void main() async {
   );
   // _handleMessage(context);
   LocalNotificationService.setup();
+  Location().askPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   NotificationServices().isTokenRefreshed();
   runApp(const MyApp());
@@ -206,8 +209,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     HomeWidget.registerInteractivityCallback(interactiveCallback);
-    backgroundContext = context;
-    _handleMessage(context);
+    _handleMessage();
     super.initState();
   }
 
@@ -245,10 +247,10 @@ Future<void> initPlatform() async {
   // print('something is happening');
 }
 
-void _handleMessage(BuildContext context) {
+void _handleMessage() {
   NotificationServices _notificationServices = NotificationServices();
   _notificationServices.requestNotificationPermission();
-  _notificationServices.firebaseInit(context);
+  _notificationServices.firebaseInit();
   _notificationServices.getToken();
-  _notificationServices.setUpInteractMessage(context);
+  _notificationServices.setUpInteractMessage();
 }

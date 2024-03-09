@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/receive_notification.dart';
 import 'package:csrs/services/send_notification.dart';
 import 'package:csrs/services/sms_service.dart';
 import 'package:csrs/utils/custom_snackbar.dart';
@@ -13,6 +15,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:popover/popover.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/location.dart';
 import '../utils/custom_widgets.dart';
 
@@ -28,13 +31,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> checkCurrentUser() async {
     NodeApis nodeApis = NodeApis();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getString('currentUser') != null){
+      user = jsonDecode(prefs.getString('currentUser')!);
+      print('got user from shared prefs and it is : $user');
+    }else{
     user = await nodeApis.getCurrentUser();
-    print('current user got is : $user');
-
+    print('got user from node apis');
+    }
     setState(() {
       user = user['data'];
     });
-    print('currentuser is  : ${user.toString()}');
+    print('currnt user saved in shared prefs is : ${prefs.getString('currentUser')}');
   }
 
   @override
@@ -159,20 +167,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: ()async {
-               Location location = Location();
-               var loc = await location.getLocation();
-               print(loc);
-                String langitude = loc['langitude'].toString();
-                String longitude = loc['longitude'].toString();
-               // print('location is : $langitude, $longitude');
-               String message =
-                   '${user['username'].toString()} is in trouble please help him out!!'
-                   ' This alert is generated through CSRS app. Click to see harshit\'s'
-                   ' location : https://www.google.com/maps/place/$langitude,$longitude';
-               kSnackBar(context, message , 'title', ContentType.warning);
-               print(message);
+                // SendNotificationServices.sendNotificationToContacts('title', 'body', false, user['email'].toString());
               },
+
               child: const Text('testing button'),
+            ),ElevatedButton(
+              onPressed: ()async {
+                NotificationServices().cancelNotification();
+
+              },
+              child: const Text('testing button 2'),
             ),
           ],
         ),

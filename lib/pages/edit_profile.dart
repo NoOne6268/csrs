@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
@@ -278,14 +280,34 @@ class _EditProfileState extends State<EditProfile> {
                                   isLoading = true;
                                 });
                                 Map<String, dynamic> response;
+                                //change in currentUser cookie the new name and roll no
+
+                                // prefs.setString('currentUser', jsonEncode({
+                                //   'data': {
+                                //     'username': nameController.text,
+                                //     'rollNo': rollNoController.text,
+                                //     'email': widget.email,
+                                //     'imageUrl': widget.imageUrl,
+                                //   }
+                                // }));
                                 response = await nodeApis.saveProfile(
                                     widget.email!,
                                     nameController.text,
                                     File(prefs.getString('profile_photo')!),
                                     rollNoController.text);
+                                // CoolAlert.show(
+                                //   context: context,
+                                //   type: CoolAlertType.success,
+                                //   title: 'Profile updated successfully',
+                                //   text: 'Your profile has been updated successfully',
+                                //   onConfirmBtnTap: () {
+                                //     context.pop();
+                                //   },
+                                // );
                                 setState(() {
                                   isLoading = false;
                                 });
+                                  context.push('/home');
                                 kSnackBar(
                                     context,
                                     response['status'] == 'success'
@@ -296,7 +318,6 @@ class _EditProfileState extends State<EditProfile> {
                                         ? ContentType.success
                                         : ContentType.failure);
                                 if (response['status'] == 'success') {
-                                  context.push('/home');
                                 }
                               }
                             },
