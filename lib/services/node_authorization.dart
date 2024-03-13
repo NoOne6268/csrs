@@ -213,16 +213,53 @@ class NodeApis {
       return {};
     }
   }
+ void createEmergency(String email)async{
+    try{
+      Location location = Location();
+      var locationData = await location.getLocation();
+      print('location is : $locationData');
+      var response = await http.post(
+        Uri.parse('$baseUrl/emergency/new'),
+          body: jsonEncode(<String, String>{
+            "email" : email,
+            'latitude': locationData['langitude'].toString(),
+            'longitude': locationData['longitude'].toString(),
+            'status' : "pending",
+            "landmark": "nearby",
+          }),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          }
+      );
 
-  Future<List<int>> compressImage(List<int> imageBytes) async {
-    // Decode image bytes to Image object
-    img.Image image = img.decodeImage(imageBytes as Uint8List)!;
-    // Resize the image to reduce dimensions
-    image = img.copyResize(image,
-        width:
-            800); // Resize to a width of 800 pixels, maintaining aspect ratio
-    // Encode the image to JPEG format with specified quality (0-100)
-    List<int> compressedImageBytes = img.encodeJpg(image, quality: 80);
-    return compressedImageBytes;
-  }
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var data = jsonDecode(response.body);
+      prefs.setString('emergencyId', data['data']['_id']);
+      print('this is response after creating emergency is: ' + data['data']['_id']);
+
+    }
+    catch(e){
+      print('error in creating emergency is : $e');
+
+    }
+}
+void resolveEmergency()async{
+    try{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var id = prefs.getString('emergencyId');
+      var response = await http.put(
+        Uri.parse('$baseUrl/emergency/resolve'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body:jsonEncode(<String , String >{
+          'id' : id!,
+      })
+      );
+      print('this is response after resolving emergency is: ${response.body}');
+    }
+    catch(e){
+      print('error in resolving emergency is : $e');
+    }
+}
 }

@@ -167,13 +167,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: ()async {
-                // SendNotificationServices.sendNotificationToContacts('title', 'body', false, user['email'].toString());
+                NodeApis().createEmergency(user['email']);
               },
 
               child: const Text('testing button'),
             ),ElevatedButton(
               onPressed: ()async {
-                NotificationServices().cancelNotification();
+            NodeApis().resolveEmergency();
 
               },
               child: const Text('testing button 2'),
