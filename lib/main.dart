@@ -164,7 +164,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // _handleMessage(context);
+  // clear all saved shared prefs
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // prefs.clear();
   LocalNotificationService.setup();
+
   Location().askPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   NotificationServices().isTokenRefreshed();
@@ -173,7 +177,6 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }

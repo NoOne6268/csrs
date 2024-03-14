@@ -1,6 +1,7 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/services/local_notification_service.dart';
+import 'package:csrs/services/node_authorization.dart';
 import 'package:csrs/services/receive_notification.dart';
 import 'package:csrs/services/send_notification.dart';
 import 'package:csrs/services/sms_service.dart';
@@ -60,6 +61,7 @@ class _SosScreenState extends State<SosScreen> {
         'Click on this notification see ${widget.name}\'s location ',
         true,
         widget.email!);
+    NodeApis().createEmergency(widget.email!);
     SMSService.sendSMSToContacts(widget.email!, message);
     setState(() {
       isLoading = false;
@@ -87,6 +89,7 @@ class _SosScreenState extends State<SosScreen> {
         'Click on this notification see ${widget.name}\'s last location',
         true,
         widget.email!);
+    NodeApis().resolveEmergency();
     SMSService.sendSMSToContacts(widget.email!, message);
     setState(() {
       isLoading = false;
@@ -101,6 +104,20 @@ class _SosScreenState extends State<SosScreen> {
     getContact();
   }
 
+  void showAlert(){
+    CoolAlert.show(
+      context: context,
+      type: CoolAlertType.confirm,
+      title: 'Are you sure you are safe?',
+      confirmBtnText: 'Yup!!',
+      cancelBtnText: 'Miss Tap',
+      onConfirmBtnTap: () async {
+        await sosResolved();
+        context.pushReplacementNamed('/home');
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +125,7 @@ class _SosScreenState extends State<SosScreen> {
       appBar: kBackAppbar(
         context,
         color: const Color(0xFFEB5151),
+        isBack: false,
       ),
       body: Center(
         child: isLoading
@@ -121,7 +139,7 @@ class _SosScreenState extends State<SosScreen> {
                         ksosText(
                           showText: 'Emergency signal Received.',
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         ksosText(
@@ -140,20 +158,7 @@ class _SosScreenState extends State<SosScreen> {
                             backgroundColor: Color(0xFF7ACAA6),
                           ),
                           onPressed: () {
-                            CoolAlert.show(
-                              context: context,
-                              type: CoolAlertType.confirm,
-                              title: 'Are you sure you are safe?',
-                              confirmBtnText: 'Yup!!',
-                              cancelBtnText: 'Miss Tap',
-                              onConfirmBtnTap: () async {
-                                await sosResolved();
-                                context.push('/home');
-                              },
-                              onCancelBtnTap: () {
-                                Navigator.of(context).pop();
-                              },
-                            );
+                            showAlert();
                           },
                           child: const Text(
                             'Safe now',

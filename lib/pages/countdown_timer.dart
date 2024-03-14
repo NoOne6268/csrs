@@ -61,7 +61,7 @@ class _CountdownScreenState extends State<CountdownScreen> {
               isReverseAnimation: true,
               autoStart: true,
               onComplete: () {
-                context.pushNamed('/sos', queryParameters: {
+                context.pushReplacementNamed('/sos', queryParameters: {
                   'email': widget.email,
                   'name': widget.name
                 });

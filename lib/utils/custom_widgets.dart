@@ -380,18 +380,19 @@ Padding kContactTile(
 // ];
 
 PreferredSize kBackAppbar(BuildContext context,
-    {required Color color, bool isTitle = false, String titleText = ''}) {
+    {required Color color, bool isTitle = false, String titleText = '', bool isBack = true}) {
   return PreferredSize(
     preferredSize: const Size.fromHeight(75.0),
     child: AppBar(
-      leading: IconButton(
+      automaticallyImplyLeading: isBack,
+      leading: isBack ? IconButton(
         icon: const Icon(
           Icons.arrow_back_rounded,
           color: Colors.white,
           size: 35,
         ),
         onPressed: () => context.pop(),
-      ),
+      ) : null,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(24),

@@ -1,6 +1,8 @@
 import 'package:csrs/services/node_authorization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:flutter_sms/flutter_sms.dart';
@@ -34,18 +36,22 @@ Drawer kSideDrawer(BuildContext context, String name, String rollNo,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 25,
+                    FittedBox(
+                      child: Text(
+                        name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
                       ),
                     ),
-                    Text(
-                      rollNo,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                    FittedBox(
+                      child: Text(
+                        rollNo,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                   ],

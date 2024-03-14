@@ -225,7 +225,7 @@ class NodeApis {
             'latitude': locationData['langitude'].toString(),
             'longitude': locationData['longitude'].toString(),
             'status' : "pending",
-            "landmark": "nearby",
+            "landmark": "chedis",
           }),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
