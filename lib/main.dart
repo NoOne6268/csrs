@@ -1,4 +1,5 @@
 import 'package:csrs/pages/contacts.dart';
+import 'package:csrs/pages/notification.dart';
 import 'package:csrs/pages/otpVerification.dart';
 import 'package:csrs/pages/add_image.dart';
 import 'package:csrs/pages/edit_profile.dart';
@@ -130,6 +131,15 @@ final GoRouter _router = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: 'notifications',
+          name : '/notifications',
+          builder: (BuildContext context, GoRouterState state) {
+            return  NotificationScreen(
+              email: state.uri.queryParameters['email'],
+            );
+          },
+        )
       ],
     ),
   ],
@@ -148,11 +158,18 @@ Future<void> interactiveCallback(Uri? data) async {
 }
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+Future<void> backgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   print('Handling a background message ${message.messageId}');
   print('message is ${message.data}');
-  _handleMessage();
+  NotificationServices _notificationServices = NotificationServices();
+  _notificationServices.requestNotificationPermission();
+  _notificationServices.firebaseInit();
+  _notificationServices.getToken();
+  _notificationServices.setUpInteractMessage();
   // NotificationServices().setUpInteractMessage(c);
   // _handleMessage(navigatorKey.currentContext!);
 }
@@ -170,7 +187,13 @@ void main() async {
   LocalNotificationService.setup();
 
   Location().askPermission();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  FirebaseMessaging.instance.getInitialMessage();
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   NotificationServices().isTokenRefreshed();
   runApp(const MyApp());
 }

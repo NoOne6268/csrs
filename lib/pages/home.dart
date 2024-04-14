@@ -112,21 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: GestureDetector(
                 onTap: () {
-                  showPopover(
-                    context: context,
-                    backgroundColor: Colors.black,
-                    bodyBuilder: (context) => ListView(
-                      children: [
-                        Hero(tag: 'ajdf', child: Text('sjfjslfdjsljfdklj')),
-                      ],
-                    ),
-                    onPop: () => print('Popover was popped!'),
-                    direction: PopoverDirection.right,
-                    width: 200,
-                    height: 400,
-                    arrowHeight: 15,
-                    arrowWidth: 30,
-                  );
+                  context.pushNamed('/notifications', queryParameters: {
+                    'email': user['email'].toString(),
+                  });
                 },
                 child: const Icon(
                   Icons.notifications,
@@ -165,19 +153,19 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 30.0,
             ),
-            ElevatedButton(
-              onPressed: ()async {
-                NodeApis().createEmergency(user['email']);
-              },
-
-              child: const Text('testing button'),
-            ),ElevatedButton(
-              onPressed: ()async {
-            NodeApis().resolveEmergency();
-
-              },
-              child: const Text('testing button 2'),
-            ),
+            // ElevatedButton(
+            //   onPressed: ()async {
+            //     NodeApis().createEmergency(user['email']);
+            //   },
+            //
+            //   child: const Text('testing button'),
+            // ),ElevatedButton(
+            //   onPressed: ()async {
+            // NodeApis().resolveEmergency();
+            //
+            //   },
+            //   child: const Text('testing button 2'),
+            // ),
           ],
         ),
       ),

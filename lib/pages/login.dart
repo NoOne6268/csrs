@@ -1,9 +1,11 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../main.dart';
 
@@ -17,12 +19,21 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool obscureText = true;
   bool isPhone = false;
+  bool isLoading = false;
 
   // AuthService authService = AuthService();
   NodeApis nodeApis = NodeApis();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  Future<void> loading() async {
+    if (isLoading) {
+      CoolAlert.show(context: context, type: CoolAlertType.loading);
+      print('isloading ');
+    }
+  }
+
 
   @override
   void initState() {
@@ -45,7 +56,16 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Column(
+      body:isLoading ?
+
+      Center(
+        child: LoadingAnimationWidget.twistingDots(
+          leftDotColor: const Color(0xFF1A1A3F),
+          rightDotColor: const Color(0xFFEA3799),
+          size: 50,
+        ),
+      ) :      Column(
+
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(
@@ -96,6 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'Send OTP',
                         onPress: () async {
                           if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              isLoading = true;
+                            });
                             if (isPhone) {
                               var response = await nodeApis.sendOtp(
                                   'login/phone', emailController.text, false);
@@ -142,6 +165,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               }
                             }
+                            setState(() {
+                              isLoading = false;
+                            });
                           }
                         },
                       ),
@@ -183,17 +209,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () {
                         context.push('/signup/email');
                       },
-                      child: const Center(
-                        child: Text(
-                          'Signup Instead',
-                          style: TextStyle(
-                            fontSize: 25,
-                            shadows: [
-                              Shadow(color: Colors.black, offset: Offset(0, -5))
-                            ],
-                            color: Colors.transparent,
-                            decoration: TextDecoration.underline,
-                          ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Don\'t have an account?',
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  shadows: [
+                                    Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(0, -5))
+                                  ],
+                                  color: Colors.transparent,
+                                )),
+                            TextButton(
+                              onPressed: () {
+                                context.push('/signup/email');
+                              },
+                              style: ButtonStyle(
+                                overlayColor: MaterialStateProperty.all(
+                                    Colors.green),
+                              ),
+                              child: const Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  shadows: [
+                                    Shadow(
+                                        color: Colors.blue,
+                                        offset: Offset(0, -5))
+                                  ],
+                                  color: Colors.transparent,
+
+                                  // decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

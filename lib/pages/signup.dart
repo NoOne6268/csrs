@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../utils/custom_snackbar.dart';
 
@@ -20,6 +21,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   // AuthService authService = AuthService();
+  bool isLoading = false;
   NodeApis nodeApis = NodeApis();
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
@@ -39,7 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return  SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
@@ -54,7 +56,15 @@ class _SignupScreenState extends State<SignupScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: Column(
+        body:isLoading ?
+
+        Center(
+          child: LoadingAnimationWidget.twistingDots(
+            leftDotColor: const Color(0xFF1A1A3F),
+            rightDotColor: const Color(0xFFEA3799),
+            size: 50,
+          ),
+        ) :  Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Hero(
@@ -93,6 +103,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           bgColor: Colors.white,
                           text: 'Send OTP', onPress: () async {
                         if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            isLoading = true;
+                          });
                           var response = await nodeApis.sendOtp(
                               'signup/email',
                               '${emailController.text}@kgpian.iitkgp.ac.in',
@@ -111,6 +124,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                   '${emailController.text}@kgpian.iitkgp.ac.in',
                             });
                           }
+                          setState(() {
+                            isLoading = false;
+                          });
                           kSnackBar(
                               context,
                               response['message'],

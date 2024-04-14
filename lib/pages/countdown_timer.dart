@@ -49,7 +49,7 @@ class _CountdownScreenState extends State<CountdownScreen> {
               width: MediaQuery.of(context).size.width / 2,
               height: MediaQuery.of(context).size.height / 2,
               strokeWidth: 15.0,
-              duration: 10,
+              duration: 2,
               fillColor: const Color(0xFFEB5151),
               ringColor: Colors.white,
               textFormat: CountdownTextFormat.MM_SS,

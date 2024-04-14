@@ -4,6 +4,7 @@ import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen(
@@ -31,6 +32,7 @@ class OtpVerificationScreen extends StatefulWidget {
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
   NodeApis nodeApis = NodeApis();
+  bool isLoading = false;
   TextEditingController otpController = TextEditingController();
 
   @override
@@ -50,116 +52,130 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Hero(
-              tag: 'logo',
-              child: Image.asset(
-                'assets/icon_flutter.png',
-                height: 175,
-              ),
-            ),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24)),
-                  color: Color(0xFF90BDDB),
+        body: isLoading
+            ? Center(
+                child: LoadingAnimationWidget.twistingDots(
+                  leftDotColor: const Color(0xFF1A1A3F),
+                  rightDotColor: const Color(0xFFEA3799),
+                  size: 50,
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      kAuthFormField(
-                        otpController,
-                        'OTP',
-                        'otp cannot be empty',
-                        key: const ValueKey('otp'),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      kAuthOtpButton(context,
-                          textColor: Colors.white,
-                          bgColor: Colors.black,
-                          text: widget.loginOrRegister!, onPress: () {
-                        if (_formKey.currentState!.validate()) {
-                          // print('to is ${widget.email!} ${widget.phone!}');
-                          print('isEmail is ${widget.isEmail!}');
-                          if (widget.nextRoute == 'signup/phone') {
-                            // verifying otp sent on email for signup process
-                            nodeApis
-                                .verifyOtp('signup/verify', widget.email!,
-                                    otpController.text, true)
-                                .then((value) {
-                              kSnackBar(
-                                  context,
-                                  value['success'] == true
-                                      ? 'OTP verified successfully!!'
-                                      : 'OTP verification failed!!',
-                                  value['success'].toString(),
-                                  value['success'] == true
-                                      ? ContentType.success
-                                      : ContentType.failure);
-                              // if verified to be true, then redirect user to verify phone no
-                              if (value['success'] == true) {
-                                context.pushNamed('signup/phone',
-                                    queryParameters: {
-                                      'email': widget.email!,
-                                      'rollNo': widget.rollNo!,
-                                    });
-                              }
-                            });
-                          } else if (widget.nextRoute == 'home') {
-                            // verifying otp sent on phone for login process
-                            print('otp is ${otpController.text}');
-                            String to = widget.isEmail == 'true'
-                                ? widget.email!
-                                : widget.phone!;
-                            bool isEmail =
-                                widget.isEmail == 'true' ? true : false;
-                            nodeApis
-                                .verifyOtp('login/verify', to,
-                                    otpController.text, isEmail)
-                                .then((value) {
-                              print('value is $value');
-                              kSnackBar(
-                                  context,
-                                  value['message'],
-                                  value['success'].toString(),
-                                  value['success'] == true
-                                      ? ContentType.success
-                                      : ContentType.failure);
-                              if (value['success'] == true) {
-                                context.push('/home');
-                              }
-                            });
-                          } else if (widget.nextRoute == 'profile') {
-                            // user is created after verifying otp sent on phone
-                            nodeApis
-                                .signUp('setyourname', widget.rollNo!,
-                                    widget.email!, widget.phone!, context)
-                                .then((value) {
-                              print('sign up api is called');
-                            });
-                            //then redirected to create profile
-                          }
-                          // context.go('/home');
-                        }
-                      })
-                    ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Hero(
+                    tag: 'logo',
+                    child: Image.asset(
+                      'assets/icon_flutter.png',
+                      height: 175,
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24)),
+                        color: Color(0xFF90BDDB),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            kAuthFormField(
+                              otpController,
+                              'OTP',
+                              'otp cannot be empty',
+                              key: const ValueKey('otp'),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            kAuthOtpButton(context,
+                                textColor: Colors.white,
+                                bgColor: Colors.black,
+                                text: widget.loginOrRegister!,
+                                onPress: () {
+                              if (_formKey.currentState!.validate()) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                // print('to is ${widget.email!} ${widget.phone!}');
+                                print('isEmail is ${widget.isEmail!}');
+                                if (widget.nextRoute == 'signup/phone') {
+                                  // verifying otp sent on email for signup process
+                                  nodeApis
+                                      .verifyOtp('signup/verify', widget.email!,
+                                          otpController.text, true)
+                                      .then((value) {
+                                    kSnackBar(
+                                        context,
+                                        value['success'] == true
+                                            ? 'OTP verified successfully!!'
+                                            : 'OTP verification failed!!',
+                                        value['success'].toString(),
+                                        value['success'] == true
+                                            ? ContentType.success
+                                            : ContentType.failure);
+                                    // if verified to be true, then redirect user to verify phone no
+                                    if (value['success'] == true) {
+                                      context.pushNamed('signup/phone',
+                                          queryParameters: {
+                                            'email': widget.email!,
+                                            'rollNo': widget.rollNo!,
+                                          });
+                                    }
+                                  });
+                                } else if (widget.nextRoute == 'home') {
+                                  // verifying otp sent on phone for login process
+                                  print('otp is ${otpController.text}');
+                                  String to = widget.isEmail == 'true'
+                                      ? widget.email!
+                                      : widget.phone!;
+                                  bool isEmail =
+                                      widget.isEmail == 'true' ? true : false;
+                                  nodeApis
+                                      .verifyOtp('login/verify', to,
+                                          otpController.text, isEmail)
+                                      .then((value) {
+                                    print('value is $value');
+                                    kSnackBar(
+                                        context,
+                                        value['message'],
+                                        value['success'].toString(),
+                                        value['success'] == true
+                                            ? ContentType.success
+                                            : ContentType.failure);
+                                    if (value['success'] == true) {
+                                      context.push('/home');
+                                    }
+                                  });
+                                } else if (widget.nextRoute == 'profile') {
+                                  // user is created after verifying otp sent on phone
+                                  nodeApis
+                                      .signUp('setyourname', widget.rollNo!,
+                                          widget.email!, widget.phone!, context)
+                                      .then((value) {
+                                    print('sign up api is called');
+                                  });
+                                  //then redirected to create profile
+                                }
+                               setState(() {
+                                  isLoading = false;
+                               });
+                              }
+                            })
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -34,7 +35,7 @@ class _ProfileImageState extends State<ProfileImage> {
   TextEditingController nameController = TextEditingController();
   late Directory directory;
   late SharedPreferences prefs;
-
+  bool isLoading = false;
   void saveImage(CroppedFile image) async {
     final path = directory.path;
     final fileName = basename(image.path);
@@ -67,7 +68,7 @@ class _ProfileImageState extends State<ProfileImage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       // backgroundColor: Colors.cyan,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(75.0),
@@ -88,7 +89,16 @@ class _ProfileImageState extends State<ProfileImage> {
         ),
       ),
 
-      body: SingleChildScrollView(
+      body: isLoading ?
+
+      Center(
+
+        child: LoadingAnimationWidget.twistingDots(
+          leftDotColor: const Color(0xFF1A1A3F),
+          rightDotColor: const Color(0xFFEA3799),
+          size: 50,
+        ),
+      ) :  SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.6,
@@ -211,6 +221,9 @@ class _ProfileImageState extends State<ProfileImage> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        isLoading = true;
+                      });
                       var response = await nodeApis.saveProfile(
                           widget.email!,
                           nameController.text,
@@ -228,8 +241,11 @@ class _ProfileImageState extends State<ProfileImage> {
                               : ContentType.failure);
                       if (response['status'] == 'success') {
                         print('hello world');
-                        context.push('/login');
+                        context.push('/home');
                       }
+                      setState(() {
+                        isLoading = false;
+                      });
                     }
                   },
                   child: const Text(

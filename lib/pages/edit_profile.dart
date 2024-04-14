@@ -4,6 +4,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/utils/custom_snackbar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
@@ -97,19 +98,15 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
 
-      body: isLoading
-          ? const Center(
-        heightFactor: 10,
-              widthFactor: 10,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 Text('Please wait...'),
-                SizedBox(height: 20),
-                CircularProgressIndicator(),
-              ],
-            ))
-          : SingleChildScrollView(
+      body: isLoading ?
+
+      Center(
+        child: LoadingAnimationWidget.twistingDots(
+          leftDotColor: const Color(0xFF1A1A3F),
+          rightDotColor: const Color(0xFFEA3799),
+          size: 50,
+        ),
+      ) :  SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.7,

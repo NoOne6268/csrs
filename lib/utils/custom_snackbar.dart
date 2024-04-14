@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 void kSnackBar(BuildContext context, String message,String title,
     ContentType contentType) {
   final snackBar = SnackBar(
-    padding: const EdgeInsets.symmetric(horizontal: 10 , vertical: 5),
+    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
     margin: const EdgeInsets.symmetric(horizontal: 2 , vertical: 2),
     elevation: 0,
     behavior: SnackBarBehavior.floating,

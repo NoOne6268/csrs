@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:csrs/utils/custom_widgets.dart';
 import 'package:csrs/services/node_authorization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SignupScreen2 extends StatefulWidget {
   const SignupScreen2({super.key, this.email, this.rollNo});
@@ -20,6 +21,7 @@ class SignupScreen2 extends StatefulWidget {
 class _SignupScreen2State extends State<SignupScreen2> {
   NodeApis nodeApis = NodeApis();
   bool obscureText = true;
+  bool isLoading =false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController phoneController = TextEditingController();
 
@@ -39,7 +41,15 @@ class _SignupScreen2State extends State<SignupScreen2> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Column(
+      body: isLoading ?
+
+      Center(
+        child: LoadingAnimationWidget.twistingDots(
+          leftDotColor: const Color(0xFF1A1A3F),
+          rightDotColor: const Color(0xFFEA3799),
+          size: 50,
+        ),
+      ) : Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Hero(
@@ -76,13 +86,16 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         bgColor: Colors.white,
                         text: 'Send OTP', onPress: () async {
                       if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          isLoading = true;
+                        });
                         var response = await nodeApis.sendOtp(
                             'signup/phone', phoneController.text, false);
                         kSnackBar(
                             context,
                             response['success'] == true
                                 ? "OTP sent to your phone"
-                                : "Couldn't send, please retry!",
+                                : response['message'].toString(),
                             response['success'].toString(),
                             response['success'] == true
                                 ? ContentType.success
@@ -100,7 +113,9 @@ class _SignupScreen2State extends State<SignupScreen2> {
                             'phone': phoneController.text,
                           });
                         }
-
+                setState((){
+                  isLoading = false;
+                });
                       }
                     }),
                     const HorizontalOrLine(
@@ -110,7 +125,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.push('profile');
+                        context.pushNamed('/login');
                       },
                       child: const Center(
                         child: Text(

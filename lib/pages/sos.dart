@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cool_alert/cool_alert.dart';
 import 'package:csrs/services/contact_services.dart';
 import 'package:csrs/services/local_notification_service.dart';
@@ -8,6 +10,7 @@ import 'package:csrs/services/sms_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:csrs/utils/custom_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/contact.dart';
 import '../services/location.dart';
@@ -29,14 +32,31 @@ class _SosScreenState extends State<SosScreen> {
   bool isContactLoading = true;
 
   void getContact() async {
-    var response = await ContactServices.getContacts(widget.email!);
-    setState(() {
-      var responseData = response['data'];
-      contacts =
-          createContactsFromData(responseData.cast<Map<String, dynamic>>());
-      isContactLoading = false;
-    });
-    print('response is : ${response['data']}');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.remove('contacts');
+    if(prefs.getString('contacts') == null){
+      print('if statement');
+      var response = await ContactServices.getContacts(widget.email!);
+      setState(() {
+        var responseData = response['data'];
+        contacts =
+            createContactsFromData(responseData.cast<Map<String, dynamic>>());
+        isContactLoading = false;
+      });
+      print('response is : ${response['data']}');
+    }
+    else{
+      print('else statement');
+      setState(() {
+        var responseData = prefs.getString('contacts');
+        var data = jsonDecode(responseData!);
+        data = data['data'];
+        print('response data is : $data');
+        contacts =
+            createContactsFromData(data.cast<Map<String, dynamic>>());
+        isContactLoading = false;
+      });
+    }
   }
 
   void sosInitiate() async {
@@ -99,7 +119,7 @@ class _SosScreenState extends State<SosScreen> {
   @override
   void initState() {
     // emergencyList = await _showContacts(context);
-    sosInitiate();
+    // sosInitiate();
     super.initState();
     getContact();
   }
@@ -112,7 +132,7 @@ class _SosScreenState extends State<SosScreen> {
       confirmBtnText: 'Yup!!',
       cancelBtnText: 'Miss Tap',
       onConfirmBtnTap: () async {
-        await sosResolved();
+        // await sosResolved();
         context.pushReplacementNamed('/home');
       },
     );
@@ -120,126 +140,118 @@ class _SosScreenState extends State<SosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: kBackAppbar(
-        context,
-        color: const Color(0xFFEB5151),
-        isBack: false,
-      ),
-      body: Center(
-        child: isLoading
-            ? const CircularProgressIndicator()
-            : Column(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ksosText(
-                          showText: 'Emergency signal Received.',
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        ksosText(
-                          showText: 'Help is on the way.',
-                        ),
-                        Image.asset(
-                          'assets/help.png',
-                          height: 150,
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            elevation: 6.0,
-                            backgroundColor: Color(0xFF7ACAA6),
-                          ),
-                          onPressed: () {
-                            showAlert();
-                          },
-                          child: const Text(
-                            'Safe now',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0x99EB5151),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(24),
-                          topLeft: Radius.circular(24),
-                        ),
-                      ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: kBackAppbar(
+          context,
+          color: const Color(0xFFEB5151),
+          isBack: false,
+        ),
+        body: Center(
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : Column(
+                  children: [
+                    Expanded(
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // ElevatedButton(
-                          //     onPressed: () {
-                          //       sosInitiate();
-                          //     },
-                          //     child: Text('Send SOS again')),
-                          // ElevatedButton(
-                          //   onPressed: () {
-                          //     sosResolved();
-                          //   },
-                          //   child: Text('safe sos button'),
-                          // ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Center(
-                              child: Text(
-                                'Your Emergency Contacts',
-                                style: kHighlightTextStyle,
+                          ksosText(
+                            showText: 'Emergency signal Received.',
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ksosText(
+                            showText: 'Help is on the way.',
+                          ),
+                          Image.asset(
+                            'assets/help.png',
+                            height: 150,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 6.0,
+                              backgroundColor: Color(0xFF7ACAA6),
+                            ),
+                            onPressed: () {
+                              showAlert();
+                            },
+                            child: const Text(
+                              'Safe now',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: isContactLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : contacts.isNotEmpty
-                                    ? ListView.builder(
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: contacts.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return kContactTile(
-                                            name: contacts[index].contactName!,
-                                            imageUri: contacts[index]
-                                                    .contactImageUrl ??
-                                                '',
-                                            phoneNo:
-                                                contacts[index].contactPhone!,
-                                            isDelete: false,
-                                            onPress: () {},
-                                          );
-                                        },
-                                      )
-                                    : const Center(
-                                        child: Text(
-                                          'No contacts added yet',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Color(0x99EB5151),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(24),
+                            topLeft: Radius.circular(24),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Center(
+                                child: Text(
+                                  'Your Emergency Contacts',
+                                  style: kHighlightTextStyle,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: isContactLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : contacts.isNotEmpty
+                                      ? ListView.builder(
+                                          scrollDirection: Axis.vertical,
+                                          itemCount: contacts.length,
+                                          itemBuilder:
+                                              (BuildContext context, int index) {
+                                            return kContactTile(
+                                              name: contacts[index].contactName!,
+                                              imageUri: contacts[index]
+                                                      .contactImageUrl ??
+                                                  '',
+                                              phoneNo:
+                                                  contacts[index].contactPhone!,
+                                              isDelete: false,
+                                              onPress: () {},
+                                            );
+                                          },
+                                        )
+                                      : const Center(
+                                          child: Text(
+                                            'No contacts added yet',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

@@ -60,7 +60,7 @@ class NodeApis {
 
   Future<void> logout(BuildContext context) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.remove('cookie');
+    pref.clear();
     // Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -225,7 +225,7 @@ class NodeApis {
             'latitude': locationData['langitude'].toString(),
             'longitude': locationData['longitude'].toString(),
             'status' : "pending",
-            "landmark": "chedis",
+            "landmark": "IIT Kharagpur",
           }),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
